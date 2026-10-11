@@ -121,3 +121,32 @@ Supporting:
 ## Out of scope for the initial release
 
 Full shell scripting, variable expansion, globbing, command substitution, aliases, job-control signals, and complete POSIX grammar.
+
+
+## Mini-project submission structure
+
+- **Mini-project:** Simple Shell — Command-Line Interpreter
+- **Team:** H1
+- **Team members:** Shrikar Desai (@ShrikarDesai07), Shreyas Kulkarni (@KadakWNL), Sujal Yadavi (@Aqual456), Sudeeksh Nayak (@sudeeksh02)
+- **Language:** C (C11)
+- **Target environment:** Linux / POSIX
+- **Team repository:** https://github.com/ShrikarDesai07/MiniProject_H1_SimpleShell
+- **GitHub Project board:** https://github.com/users/ShrikarDesai07/projects/5/views/1
+
+## Mini-project submission folders
+
+The numbered folders follow the Software Engineering mini-project deliverables. Existing source code and canonical engineering documents remain under src/, include/, tests/ and docs/.
+
+1. [SRS and Work Breakdown](1-SRS-and-Work-Breakdown/README.md)
+2. [Test Planning](2-Test-Planning/README.md)
+3. [Requirements Engineering — FR, NFR and RTM](3-Requirements-Engineering/README.md)
+4. [Architectural Design and UML Diagrams](4-Architectural-Design/README.md)
+5. [GitHub and Jira Evidence](5-GitHub-Jira-Evidence/README.md)
+6. [GitHub Copilot Evidence](6-Copilot-Evidence/README.md)
+7. [Software Testing, Bug Fix and Retest](7-Software-Testing/README.md)
+8. [Deployment and Environment Setup](8-Deployment/README.md)
+9. [Demo Videos and Output Evidence](9-Demo/README.md)
+
+## Submission evidence status
+
+Only genuine evidence is accepted. Copilot screenshots, actual test outputs, AI-assisted bug/patch/retest evidence, live project screenshots and Sprint demo videos will be added after those activities have occurred.
