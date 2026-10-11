@@ -1,6 +1,8 @@
-# Jira Backlog Seed — Simple Shell
+# Backlog — Simple Shell
 
-Use the project key `SH` after creating the Jira project. The issue IDs below are logical IDs; Jira will generate its own numeric keys when the issues are created.
+> **Note (Part-2 Deliverable):** The active Agile sprint backlog for Mini-Project Part-2 is tracked live on [GitHub Issues](https://github.com/ShrikarDesai07/MiniProject_H1_SimpleShell/issues) and detailed in [docs/Sprint_Backlog.md](Sprint_Backlog.md) with story point estimates and sprint assignments across the 4 team members.
+
+Use the project key `SH` if syncing with a Jira project. The issue IDs below are logical IDs; Jira will generate its own numeric keys when the issues are created.
 
 ## Epic: Requirements & Planning
 

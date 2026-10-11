@@ -34,10 +34,21 @@ Deliverable-to-file mapping is in `docs/Phase_1_Checklist.md` Section 1.
   TC-13 (background) and TC-16 (foreground synchronisation) are the only coverage for FR-07 and
   FR-09 and are not yet automated.
 
+## Phase 2 (Agile Development stage) status
+
+| Deliverable | Description / Location | Status | ETA |
+|---|---|---|---|
+| Backlog creation in GitHub | Issues #2 to #19 mapped to FR/NFRs | Published | 12th Oct 2026 |
+| Story Points assignment | Fibonacci points assigned across all stories (66 pts total) | Completed | 12th Oct 2026 |
+| Team story assignments | Distributed equally across 4 team members | Completed | 12th Oct 2026 |
+| Two Sprint plans | Sprint 1 (Oct 19–23) and Sprint 2 (Oct 26–30) documented in `docs/Sprint_Backlog.md` | Completed | 12th Oct 2026 |
+| Sprint dry run | Practice PRs and CI validation | Scheduled | 12th–16th Oct 2026 |
+| Sprint 1 execution | Working foreground shell & 1-min demo video | Scheduled | 19th–23rd Oct 2026 |
+| Sprint 2 execution | Advanced features, 2-min demo video & freeze | Scheduled | 26th–30th Oct 2026 |
+
 ## Open items
 
 1. Run `make test` and `make asan-test` on the target Linux system and paste the output into
    `Test_Report.md` Sections 5.1–5.3.
-2. Create/connect the Jira project so the logical IDs `SH-REQ-*` and `SH-NFR-*` map to real keys.
-3. Decide whether the performance-monitoring feature sketched in `CONTRIBUTING.md` becomes a
-   requirement or is dropped. It currently has no SRS requirement, RTM row or Jira issue.
+2. Link the published GitHub Issues into the GitHub Project board (Projects v2) under the repo.
+3. Conduct Sprint dry run during Oct 12–16 before starting Sprint 1 development on Oct 19.

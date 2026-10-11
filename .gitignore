@@ -15,3 +15,9 @@ simple-shell
 *.swp
 *.swo
 .DS_Store
+
+# Course / Instructor materials
+instructor_given_docs/
+
+# Scratch & temporary workspace
+scratch/

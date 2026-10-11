@@ -103,6 +103,7 @@ Supporting:
 - `docs/Architecture.md` — modules and design decisions
 - `docs/Test_Cases.md` — functional test cases and non-functional verification procedures
 - `docs/Test_Report.md` — recorded validation evidence
+- `docs/Sprint_Backlog.md` — Sprint 1 & 2 backlog, story points, and team allocations (Part-2)
 - `docs/Jira_Backlog.md` — planned issue breakdown
 - `docs/Project_Status.md` — current state and next controlled step
 
