@@ -21,10 +21,10 @@ actor "User" as user
 package "Simple Shell (C11 / POSIX)" as app {
 
   component "main.c\nEntry point" as main
-  component "shell.c\nREPL and orchestration\nshell_loop()" as shell
-  component "parser.c\nLexer and parser\nparse_line() / free_pipeline()" as parser
-  component "executor.c\nProcess execution\nexecute_pipeline() / reap_background()" as executor
-  component "builtins.c\nBuilt-in commands\nis_builtin() / run_builtin()" as builtins
+  component "shell.c\nREPL & Event Multiplexing\nshell_loop() / poll() / self-pipe" as shell
+  component "parser.c\nLexer & Pre-validation\nparse_line() / free_pipeline()" as parser
+  component "executor.c\nProcess Execution Engine\nexecute_pipeline() / reap_background()" as executor
+  component "builtins.c\nBuilt-in Commands\nis_builtin() / run_builtin()" as builtins
   database "Parser data model\nstruct Pipeline\nstruct Command" as model
 
 }
@@ -34,8 +34,8 @@ package "C standard library" as libc {
 }
 
 package "Operating system (POSIX)" as os {
-  component "Process control\nfork / execvp\nwaitpid" as proc
-  component "I/O and pipes\npipe / dup2 / open / close" as io
+  component "Process control & Signals\nfork / execvp / waitpid\nsigaction (SIGCHLD)" as proc
+  component "I/O, Pipes & Multiplexing\npipe / dup2 / poll / open / close" as io
   component "Filesystem and environment\nchdir / getcwd / PATH lookup" as fs
 }
 
@@ -51,18 +51,21 @@ executor --> proc : spawn and wait
 executor --> io : redirect and pipe
 builtins --> fs : cd / pwd
 parser --> memlib : allocate / release
+proc --> shell : SIGCHLD notification via self-pipe
 
 legend right
   <b>Enforced parser limits</b>
-  MAX_ARGS = 128 arguments
-  MAX_PIPE_SEGMENTS = 32
-  Rejects unterminated quotes, a trailing
-  backslash and dangling operators.
+  MAX_ARGS = 128 arguments after command name
+  MAX_PIPE_SEGMENTS = 32 stages
+  Rejects unterminated quotes, trailing escapes,
+  duplicate redirections and multiple & operators.
 
   <b>Execution model</b>
-  Foreground commands block in waitpid();
-  background jobs are reaped between prompts.
-  Stateful built-ins such as cd run in the parent.
+  - Foreground pipelines wait for all stages.
+  - SIGCHLD handler writes to self-pipe;
+    reaped asynchronously via poll() and waitpid().
+  - Single foreground built-ins run in parent (cd, exit);
+    built-ins in pipelines run in child processes.
 endlegend
 
 @enduml

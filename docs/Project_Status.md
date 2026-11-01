@@ -1,52 +1,104 @@
-# Project Status
+# Project Status — Simple Shell
 
-**Project:** Simple Shell
-**Team:** H1
-**Primary language:** C
-**Target:** Linux
+- **Project:** Simple Shell
+- **Team:** H1
+- **Primary Language:** C (ISO C11)
+- **Target Environment:** Linux / POSIX.1-2008
+- **Repository:** https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell
 
-## Phase 1 (Requirements stage) status
+---
 
-| Deliverable | File | Status |
-|---|---|---|
-| Problem statement / feasibility | `Problem_Statement.md`, `Feasibility_Study.md` | Prepared |
-| SRS and requirement categorization | `SRS.md` | Prepared |
-| RTM | `RTM.md` | Prepared |
-| Actors identified and named | `Use_Case_Catalog.md` §1 | Prepared — 2 actors |
-| Use cases grouped by actor | `Use_Case_Catalog.md` §2 | Prepared |
-| Use case diagram | `Use_Case_Diagram.mmd` / `.png` | Prepared |
-| Validation specification | `Validation_Specification.md` | Prepared, including penetration test plan (planning only) |
+## 1. Implementation Status
 
-Deliverable-to-file mapping is in `docs/Phase_1_Checklist.md` Section 1.
+The following core and advanced features are merged into `main` and verified through automated CI:
 
-## Implementation baseline
+- **Interactive Command Loop:** Read-Eval-Print Loop (REPL) displaying `simple-shell$ ` prompt on `stderr`, processing user input line-by-line, and gracefully handling EOF (`Ctrl-D`) and `exit`.
+- **Built-in Commands:** Parent-process execution of `cd` (including `cd -` OLDPWD and `cd` to `HOME`), `pwd`, `echo`, `help`, and `exit` with standard output buffer flushing.
+- **External Command Execution:** Process creation using `fork()`, standard executable searching and execution via `execvp()`, and parent process synchronization via `waitpid()`.
+- **Lexical Analysis & Quoting:** Whitespace tokenization, literal single quotes (`'...'`), double quotes (`"..."`) with embedded quote and backslash escape handling, and unquoted backslash escapes (`\ `).
+- **I/O Redirection:** Input redirection `<` (`O_RDONLY`), output overwrite redirection `>` (`O_WRONLY | O_CREAT | O_TRUNC`), and output append redirection `>>` (`O_WRONLY | O_CREAT | O_APPEND`) for both built-in and external commands.
+- **Multi-Stage Pipelines:** Inter-process communication pipelines (`|`) supporting up to 32 concurrent stages with intermediate descriptor cleanup, deadlock avoidance on large data streams, and child-process isolation for built-ins in pipelines.
+- **Background Execution:** Asynchronous command execution (`&`) returning control immediately to the prompt.
+- **Asynchronous Zombie Reaping:** `SIGCHLD` signal handler writing to an internal self-pipe, multiplexed with standard input via `poll()`, reaping background children and reporting termination diagnostics in real time without blocking.
+- **Operator Pre-Validation:** Syntax validation rejecting duplicate background operators (`&&`, `& &`), misplaced `&`, duplicate redirections, and limits before process spawning or file creation.
 
-- Modular C implementation in `src/` with headers in `include/`.
-- Automated parser, direct executor, and shell integration tests in `tests/`.
-- GitHub Actions CI workflow running `make`, `make test`, and `make asan-test` with timeouts on every push and pull request (Refs Issue #8).
-- Jira backlog seed in `docs/Jira_Backlog.md`.
+---
 
-## Validation state
+## 2. Sprint Status
 
-- Standard and sanitizer validation evidence, suite totals, and limitations are recorded in [Test_Report.md](Test_Report.md). The operator and two-stage pipeline evidence applies to the branch under review in [PR #27](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/27).
-- Automated coverage includes malformed syntax with no execution/file side effects, pipeline boundaries, built-in stages, both-child waiting, rightmost status, and repeated pipeline descriptor checks.
+### Sprint 1 (19th Oct – 23rd Oct 2026) — Completed
+- **Goal:** Working foreground shell with built-ins, external commands, parser, automated CI, and Sprint 1 demo video.
+- **Velocity:** 32 Story Points (100% completed).
+- **Status:** Done. All 9 user stories (#2, #3, #19, #4, #5, #6, #7, #8, #9) closed; demo video committed at `docs/demos/simple-shell-sprint1-demo.mp4`.
 
-## Phase 2 (Agile Development stage) status
+### Sprint 2 (26th Oct – 30th Oct 2026) — In Progress
+- **Goal:** Advanced features (redirection, pipelines, background execution, self-pipe reaping), resource audit, full regression, documentation finalization, and 2-minute final demo video / freeze.
+- **Velocity:** 34 Story Points planned.
+  - **Completed & Merged (18 pts):**
+    - Issue #10 (`[S2-01] I/O Redirection Support`): Closed via PR #25.
+    - Issue #11 (`[S2-02] Advanced Operator Pre-Validation`): Closed via PR #27.
+    - Issue #12 (`[S2-03] Two-Stage Pipeline Implementation`): Closed via PR #27.
+    - Issue #14 (`[S2-05] Background Execution & Reaping`): Closed via PR #28.
+  - **In Progress / Remaining (16 pts):**
+    - Issue #13 (`[S2-04] Multi-Stage Pipeline Expansion & Deadlock Prevention`, 3 pts, @sudeeksh02): Implementation merged on `main`; pending issue acceptance.
+    - Issue #15 (`[S2-06] Comprehensive Resource Audit`, 3 pts, @Aqual456): Sanitizers and descriptor checks active; audit pending completion.
+    - Issue #16 (`[S2-07] Full Regression Testing & RTM Sync`, 5 pts, @sudeeksh02): Open.
+    - Issue #17 (`[S2-08] Documentation Finalization, Architecture Sync & Deviation Log`, 3 pts, @ShrikarDesai07): In progress under feature branch `docs/issue-17-documentation-finalization`.
+    - Issue #18 (`[S2-09] 2-Minute Final Demo Video, Release Tag & Freeze`, 2 pts, @sudeeksh02): Pending completion of remaining Sprint 2 stories.
 
-| Deliverable | Description / Location | Status | ETA |
-|---|---|---|---|
-| Backlog creation in GitHub | Issues #2 to #19 mapped to FR/NFRs | Published | 12th Oct 2026 |
-| Story Points assignment | Fibonacci points assigned across all stories (66 pts total) | Completed | 12th Oct 2026 |
-| Team story assignments | Distributed equally across 4 team members | Completed | 12th Oct 2026 |
-| Two Sprint plans | Sprint 1 (Oct 19–23) and Sprint 2 (Oct 26–30) documented in `docs/Sprint_Backlog.md` | Completed | 12th Oct 2026 |
-| Sprint dry run | Practice PRs and CI validation | Historical plan; completion not separately recorded | 12th–16th Oct 2026 |
-| Sprint 1 execution | Working foreground shell & [demo evidence](demos/README.md) | Done; all Sprint 1 issues closed | 19th–23rd Oct 2026 |
-| Sprint 2 execution | Advanced features, 2-min demo video & freeze | In progress; #10 done, #11/#12 in review, #13-#18 open | 26th–30th Oct 2026 |
+---
 
-## Open items
+## 3. GitHub Issue & Pull Request Status
 
-1. Complete teammate review and merge of [PR #27](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/27) for #11/#12.
-2. Complete the remaining Sprint 2 stories (#13-#18), including resource audit, full regression/traceability review, final documentation, and the final demo/release.
-3. Capture the genuine screenshots still listed in the [GitHub evidence index](../5-GitHub-Jira-Evidence/Evidence_Index.md) and [demo evidence index](../9-Demo/Demo_Evidence_Index.md).
+### Live Issue Status
 
-The [Sprint backlog](Sprint_Backlog.md) records the status snapshot; subsequent changes are tracked on the live board.
+| Issue | Title | Assignee | State | Resolution |
+|---|---|---|:---:|---|
+| [#2](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/2) | [S1-01] Modular Architecture & C11 Build Setup | @ShrikarDesai07 | Closed | Merged via PR #22 |
+| [#3](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/3) | [S1-02] Interactive Command Loop & Prompt Display | @ShrikarDesai07 | Closed | Merged via PR #22 |
+| [#19](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/19) | [S1-03] Command Line Tokenizer & Quote Parsing | @KadakWNL | Closed | Merged via PR #20 |
+| [#4](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/4) | [S1-04] Error Diagnostics & Malformed Syntax | @KadakWNL | Closed | Merged via PR #20 |
+| [#5](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/5) | [S1-05] External Command Execution & Foreground Wait | @Aqual456 | Closed | Merged via PR #26 |
+| [#6](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/6) | [S1-06] Parser Memory Lifecycle & FD Hygiene | @Aqual456 | Closed | Merged via PR #26 |
+| [#7](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/7) | [S1-07] Built-in Commands Implementation | @sudeeksh02 | Closed | Merged via PR #21 |
+| [#8](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/8) | [S1-08] GitHub Actions CI Automation | @sudeeksh02 | Closed | Merged via PR #23 |
+| [#9](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/9) | [S1-09] Sprint 1 Validation & Demo Video | @ShrikarDesai07 | Closed | Merged via PR #24 |
+| [#10](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/10) | [S2-01] I/O Redirection Support (<, >, >>) | @ShrikarDesai07 | Closed | Merged via PR #25 |
+| [#11](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/11) | [S2-02] Advanced Operator Pre-Validation | @KadakWNL | Closed | Merged via PR #27 |
+| [#12](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/12) | [S2-03] Two-Stage Pipeline Implementation | @KadakWNL | Closed | Merged via PR #27 |
+| [#13](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/13) | [S2-04] Multi-Stage Pipeline Expansion | @sudeeksh02 | **Open** | Implemented on `main`; acceptance pending |
+| [#14](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/14) | [S2-05] Background Execution & Asynchronous Reaping | @Aqual456 | Closed | Merged via PR #28 |
+| [#15](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/15) | [S2-06] Comprehensive Resource Audit | @Aqual456 | **Open** | Active in CI; final audit report pending |
+| [#16](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/16) | [S2-07] Full Regression Testing & RTM Sync | @sudeeksh02 | **Open** | Automated suite active; formal review pending |
+| [#17](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/17) | [S2-08] Documentation Finalization & Architecture Sync | @ShrikarDesai07 | **In Progress** | Documentation in PR #29; see live review status |
+| [#18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18) | [S2-09] 2-Minute Final Demo Video & Freeze | @sudeeksh02 | **Open** | Pending final release |
+
+### Pull Request Status
+- **Merged Pull Requests:** PRs #20, #21, #22, #23, #24, #25, #26, #27, and #28 are merged into `main`.
+- **Documentation Review:** [PR #29](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/29) contains the documentation finalization for issue #17. Its live page records review and merge status.
+- **Release Tags:** Final release acceptance and development freeze are tracked in [issue #18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18); check the live issue and repository tags for their current state.
+
+---
+
+## 4. Documentation Deliverables Status
+
+| Deliverable | Location | Status | Notes |
+|---|---|:---:|---|
+| **Root README** | `README.md` | **Finalized** | Comprehensive evaluator guide with setup, features, examples, limits, test guide, and structure. |
+| **System Architecture** | `docs/Architecture.md` | **Finalized** | Detailed execution flow, module interfaces, self-pipe asynchronous reaping, and Phase 1 deviation log. |
+| **Requirements Specification** | `docs/SRS.md` | **Complete** | All 10 FRs and 8 NFRs defined with categorized acceptance criteria. |
+| **Traceability Matrix** | `docs/RTM.md` | **Updated** | Bi-directional mappings from requirements to modules, tests, and Jira keys. |
+| **Test Cases & Procedures** | `docs/Test_Cases.md` | **Complete** | Functional test cases (TC-01..18) and non-functional procedures (NFRV-01..08). |
+| **Test Execution Report** | `docs/Test_Report.md` | **Complete** | Recorded runs across unit, executor, and shell integration test suites. |
+| **Project Status** | `docs/Project_Status.md` | **Finalized** | Synchronized with live GitHub repository issues, PRs, and sprint velocity. |
+| **Sprint Backlog** | `docs/Sprint_Backlog.md` | **Synchronized** | Reflects Sprint 1 completion and current Sprint 2 progress. |
+| **Architectural Diagrams** | `4-Architectural-Design/` | **Synchronized** | `Architecture.puml` updated to reflect self-pipe and multi-stage execution model. |
+
+---
+
+## 5. Remaining Work Prior to Project Freeze
+
+1. **Review and Merge Issue #17:** Complete teammate review and merge pull request for Issue #17 documentation finalization.
+2. **Acceptance of Issue #13:** Formally close Issue #13 for multi-stage pipeline expansion.
+3. **Complete Resource Audit & Regression Review (Issues #15 & #16):** Finalize Valgrind/descriptor audit records and verify full RTM coverage.
+4. **Final 2-Minute Demo Video & Tag (Issue #18):** Verify the linked demo deliverable and final release tag on `main`, complete acceptance, and freeze development.

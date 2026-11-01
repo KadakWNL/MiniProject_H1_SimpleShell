@@ -13,12 +13,12 @@ non-functional requirements are defined in `docs/Test_Cases.md`.
 | FR-01 | Interactive input | UC-01 | `src/shell.c` | TC-01, TC-10 | Automated | SH-REQ-01 | Implemented; accepted in Sprint 1 |
 | FR-02 | External command execution | UC-03, UC-04 | `src/executor.c` | TC-02 | Automated | SH-REQ-02 | Implemented; accepted in Sprint 1 |
 | FR-03 | Built-in commands | UC-05, UC-10 | `src/builtins.c`, `src/executor.c` | TC-03, TC-04, TC-18 | Automated | SH-REQ-03 | Implemented; accepted in Sprint 1 |
-| FR-04 | Command parsing | UC-02 | `src/parser.c` | TC-05, TC-06, TC-11 | Automated | SH-REQ-04 | Implemented; additional operator validation in review (#11) |
+| FR-04 | Command parsing | UC-02 | `src/parser.c` | TC-05, TC-06, TC-11 | Automated | SH-REQ-04 | Implemented; operator pre-validation accepted (#11) |
 | FR-05 | Input/output redirection | UC-06 | `src/parser.c`, `src/executor.c` | TC-07, TC-08, TC-09 | Automated | SH-REQ-05 | Implemented; accepted (#10) |
-| FR-06 | Pipelines | UC-07 | `src/parser.c`, `src/executor.c` | TC-12 | Automated | SH-REQ-06 | Implemented; two-stage verification in review (#12), multi-stage acceptance pending (#13) |
-| FR-07 | Background execution | UC-08 | `src/parser.c`, `src/executor.c` | TC-13 | Automated | SH-REQ-07 | Implemented; background acceptance pending (#14) |
-| FR-08 | Error handling | UC-02, UC-09 | `src/shell.c`, `src/parser.c`, `src/executor.c`, `src/builtins.c` | TC-11, TC-14, TC-15 | Automated | SH-REQ-08 | Implemented; additional syntax verification in review (#11) |
-| FR-09 | Process synchronization | UC-03, UC-04 | `src/executor.c` | TC-16 | Automated | SH-REQ-09 | Implemented; both-stage verification in review (#12) |
+| FR-06 | Pipelines | UC-07 | `src/parser.c`, `src/executor.c` | TC-12 | Automated | SH-REQ-06 | Implemented; two-stage verification accepted (#12), multi-stage acceptance pending (#13) |
+| FR-07 | Background execution | UC-08 | `src/shell.c`, `src/parser.c`, `src/executor.c` | TC-13 | Automated | SH-REQ-07 | Implemented; background execution and asynchronous self-pipe reaping accepted (#14) |
+| FR-08 | Error handling | UC-02, UC-09 | `src/shell.c`, `src/parser.c`, `src/executor.c`, `src/builtins.c` | TC-11, TC-14, TC-15 | Automated | SH-REQ-08 | Implemented; syntax verification accepted (#11) |
+| FR-09 | Process synchronization | UC-03, UC-04 | `src/executor.c` | TC-16 | Automated | SH-REQ-09 | Implemented; foreground synchronization accepted (#12) |
 | FR-10 | Clean termination | UC-10 | `src/shell.c`, `src/builtins.c` | TC-01, TC-10 | Automated | SH-REQ-10 | Implemented; accepted in Sprint 1 |
 
 ## 2. Non-functional requirements
@@ -33,9 +33,9 @@ functional test cases.
 | NFR-03 | Memory safety | N/A | NFRV-03 | `make asan-test` with AddressSanitizer and UndefinedBehaviorSanitizer | SH-NFR-03 | Sanitizer checks pass; resource audit pending (#15) |
 | NFR-04 | Usability | All | NFRV-04 | Prompt and diagnostic message review | SH-NFR-04 | Prompt and diagnostic tests pass; terminal review remains |
 | NFR-05 | Portability | N/A | NFRV-05 | Build with GCC, C11, POSIX APIs on the target Linux system | SH-NFR-05 | Linux GCC C11 build and CI pass |
-| NFR-06 | Testability | N/A | NFRV-06 | CI runs `make test` on every push and pull request | SH-NFR-06 | Automated CI active; executor coverage in review |
-| NFR-07 | Security hygiene | N/A | NFRV-07 | Malformed-input suite; source check that `system()` is not used | SH-NFR-07 | Validation implemented; additional checks in review (#11) |
-| NFR-08 | Documentation | N/A | NFRV-08 | Documentation review against the supported syntax and limits | SH-NFR-08 | Documentation sync in review; finalization pending (#17) |
+| NFR-06 | Testability | N/A | NFRV-06 | CI runs `make test` on every push and pull request | SH-NFR-06 | Automated CI active; executor and shell coverage active |
+| NFR-07 | Security hygiene | N/A | NFRV-07 | Malformed-input suite; source check that `system()` is not used | SH-NFR-07 | Validation implemented and accepted (#11) |
+| NFR-08 | Documentation | N/A | NFRV-08 | Documentation review against the supported syntax and limits | SH-NFR-08 | Documentation finalization and architecture sync in progress (#17) |
 
 ## 3. Traceability rules
 
@@ -53,10 +53,11 @@ functional test cases.
 rejected-input cleanup, and the 32/33-stage limit. [Executor tests](../tests/test_executor.c)
 check pipeline status, both-stage completion, parent-state isolation, child reaping,
 and 100 repeated pipelines under a 64-descriptor limit. The [shell suite](../tests/test_shell.sh)
-checks syntax recovery without execution/file side effects and executes a 32-stage
-pipeline. Results and limitations are recorded in [Test_Report.md](Test_Report.md).
+checks syntax recovery without execution/file side effects, executes a 32-stage
+pipeline, and validates asynchronous background process reaping. Results and limitations
+are recorded in [Test_Report.md](Test_Report.md).
 
-The added coverage is under review in [PR #27](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/27).
+The coverage was merged into `main` via [PR #27](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/27) and [PR #28](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/28).
 
 
 These are known and deliberately left open rather than silently reported as covered.
@@ -65,4 +66,4 @@ These are known and deliberately left open rather than silently reported as cove
 |---|---|---|
 | Full regression/resource acceptance remains open | NFR-01, NFR-03, TC-17 | Automated stress covers repeated redirections/pipelines and descriptor counts; finish #15/#16 before release. |
 | System-call failure paths are not injected by tests | FR-08, FR-09 | `fork`, `pipe`, and `waitpid` failures still require targeted fault-injection coverage. |
-| Interactive background completion/reaping | FR-07 | The harness checks non-blocking return; complete acceptance under #14. |
+| Final release freeze and demo | NFR-08, Deliverables | Complete final 2-minute demo video and development freeze under #18. |

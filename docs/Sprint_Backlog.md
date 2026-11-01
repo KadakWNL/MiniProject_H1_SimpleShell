@@ -5,9 +5,10 @@
 **ETA:** 12th October 2026  
 **Status:** Published to GitHub Issues & Board
 
-Status snapshot: Sprint 1 issues and redirection (#10) are closed. Operator validation
-and two-stage pipeline verification (#11/#12) are in review in [PR #27](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/27).
-The [live board](https://github.com/orgs/SE-H1-SimpleShell/projects/2) is authoritative for subsequent status changes.
+Status snapshot: Sprint 1 issues and Sprint 2 issues #10, #11, #12, and #14 are closed.
+Operator validation and pipeline verification were merged in [PR #27](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/27),
+and background execution was merged in [PR #28](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/28).
+Consult the [live issues](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues) and [board](https://github.com/orgs/SE-H1-SimpleShell/projects/2) for subsequent changes; board cards may lag issue closure.
 
 ---
 
@@ -48,13 +49,13 @@ The [live board](https://github.com/orgs/SE-H1-SimpleShell/projects/2) is author
 | Issue | Title | Epic | Requirements | Points | Assignee | Status |
 |---|---|---|---|:---:|---|:---:|
 | [#10](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/10) | [S2-01] I/O Redirection Support (<, >, >>) for Built-in & External Commands | Advanced Features | FR-05, FR-08, NFR-03 | 5 | @ShrikarDesai07 | Done |
-| [#11](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/11) | [S2-02] Advanced Operator Pre-Validation & Strict Syntax Verification | Advanced Features | FR-04, FR-08, NFR-07 | 3 | @KadakWNL | In review |
-| [#12](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/12) | [S2-03] Two-Stage Pipeline Implementation Connecting Commands and Built-ins | Advanced Features | FR-06, FR-09, NFR-03 | 5 | @KadakWNL | In review |
+| [#11](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/11) | [S2-02] Advanced Operator Pre-Validation & Strict Syntax Verification | Advanced Features | FR-04, FR-08, NFR-07 | 3 | @KadakWNL | Done |
+| [#12](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/12) | [S2-03] Two-Stage Pipeline Implementation Connecting Commands and Built-ins | Advanced Features | FR-06, FR-09, NFR-03 | 5 | @KadakWNL | Done |
 | [#13](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/13) | [S2-04] Multi-Stage Pipeline Expansion & Deadlock Prevention | Advanced Features | FR-05, FR-06, FR-09 | 3 | @sudeeksh02 | Backlog |
-| [#14](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/14) | [S2-05] Background Command Execution (&) & Asynchronous Zombie Reaping | Advanced Features | FR-07, FR-09 | 5 | @Aqual456 | Backlog |
+| [#14](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/14) | [S2-05] Background Command Execution (&) & Asynchronous Zombie Reaping | Advanced Features | FR-07, FR-09 | 5 | @Aqual456 | Done |
 | [#15](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/15) | [S2-06] Comprehensive Resource Audit: Sanitizers, Descriptors & Stress Safety | Testing & Quality | FR-10, NFR-01, NFR-03 | 3 | @Aqual456 | Backlog |
 | [#16](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/16) | [S2-07] Full Regression Testing, RTM Traceability Sync & Test Report | Testing & Quality | FR-01–10, NFR-01, NFR-04–07 | 5 | @sudeeksh02 | Backlog |
-| [#17](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/17) | [S2-08] Documentation Finalization, Architecture Sync & Deviation Log | Documentation & Release | NFR-02, NFR-08 | 3 | @ShrikarDesai07 | Backlog |
+| [#17](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/17) | [S2-08] Documentation Finalization, Architecture Sync & Deviation Log | Documentation & Release | NFR-02, NFR-08 | 3 | @ShrikarDesai07 | In progress |
 | [#18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18) | [S2-09] 2-Minute Final Demo Video, Release Tag & Development Freeze | Documentation & Release | Deliverable 3.b, 3.d | 2 | @sudeeksh02 | Backlog |
 
 **Sprint 2 Velocity:** 34 Story Points
