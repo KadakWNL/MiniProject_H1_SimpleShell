@@ -5,7 +5,6 @@
 - **Primary Language:** C (ISO C11)
 - **Target Environment:** Linux / POSIX.1-2008
 - **Repository:** https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell
-- **Status Last Updated:** 31 October 2026
 
 ---
 
@@ -71,13 +70,13 @@ The following core and advanced features are merged into `main` and verified thr
 | [#14](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/14) | [S2-05] Background Execution & Asynchronous Reaping | @Aqual456 | Closed | Merged via PR #28 |
 | [#15](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/15) | [S2-06] Comprehensive Resource Audit | @Aqual456 | **Open** | Active in CI; final audit report pending |
 | [#16](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/16) | [S2-07] Full Regression Testing & RTM Sync | @sudeeksh02 | **Open** | Automated suite active; formal review pending |
-| [#17](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/17) | [S2-08] Documentation Finalization & Architecture Sync | @ShrikarDesai07 | **In Progress** | PR prepared on feature branch |
+| [#17](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/17) | [S2-08] Documentation Finalization & Architecture Sync | @ShrikarDesai07 | **In Progress** | Documentation in PR #29; see live review status |
 | [#18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18) | [S2-09] 2-Minute Final Demo Video & Freeze | @sudeeksh02 | **Open** | Pending final release |
 
 ### Pull Request Status
 - **Merged Pull Requests:** PRs #20, #21, #22, #23, #24, #25, #26, #27, and #28 are merged into `main`.
-- **Open Pull Requests on `main`:** None currently. Feature branch `docs/issue-17-documentation-finalization` is ready to open against `main`.
-- **Release Tags:** 0 tags currently created. Release tagging will take place under Issue #18 upon development freeze.
+- **Documentation Review:** [PR #29](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/29) contains the documentation finalization for issue #17. Its live page records review and merge status.
+- **Release Tags:** Final release acceptance and development freeze are tracked in [issue #18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18); check the live issue and repository tags for their current state.
 
 ---
 
@@ -102,4 +101,4 @@ The following core and advanced features are merged into `main` and verified thr
 1. **Review and Merge Issue #17:** Complete teammate review and merge pull request for Issue #17 documentation finalization.
 2. **Acceptance of Issue #13:** Formally close Issue #13 for multi-stage pipeline expansion.
 3. **Complete Resource Audit & Regression Review (Issues #15 & #16):** Finalize Valgrind/descriptor audit records and verify full RTM coverage.
-4. **Final 2-Minute Demo Video & Tag (Issue #18):** Record and commit the genuine 2-minute final project demonstration video and tag the final release upon development freeze.
+4. **Final 2-Minute Demo Video & Tag (Issue #18):** Verify the linked demo deliverable and final release tag on `main`, complete acceptance, and freeze development.

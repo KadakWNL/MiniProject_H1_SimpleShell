@@ -55,7 +55,7 @@ proc --> shell : SIGCHLD notification via self-pipe
 
 legend right
   <b>Enforced parser limits</b>
-  MAX_ARGS = 128 arguments
+  MAX_ARGS = 128 arguments after command name
   MAX_PIPE_SEGMENTS = 32 stages
   Rejects unterminated quotes, trailing escapes,
   duplicate redirections and multiple & operators.

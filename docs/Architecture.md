@@ -88,7 +88,7 @@ Simple Shell resolves this using a dedicated unidirectional UNIX pipe (`sigchld_
    - Reaps all terminated background children.
    - Emits asynchronous diagnostic messages to `stderr` (e.g. `[background pid 12345 exited 0]`).
    - Prevents zombie process accumulation.
-6. **Zero-Latency Idle Detection:** Because `poll()` wakes immediately upon receiving the self-pipe byte, background process terminations are detected and reported in real time, even while the user is idle at the command prompt.
+6. **Idle Detection:** A self-pipe notification wakes `poll()`, allowing completed background processes to be reaped while the user is idle at the prompt. Handling occurs when the shell is scheduled; it is not a real-time latency guarantee.
 7. **Foreground Concurrency Reaping:** If a background child finishes while the shell is blocked in `execute_children()` waiting for foreground pipeline stages, the `waitpid(-1, &status, 0)` loop detects that the reaped PID belongs to a background job, prints its termination message to `stderr`, and continues waiting for the foreground pipeline stages without interruption.
 
 ---
@@ -111,7 +111,7 @@ Pipelines (`count >= 2`) or external commands execute in child processes spawned
 - **Redirection Precedence:** In `child_exec()`, pipeline descriptors are duplicated first, followed by explicit command file redirections (`cmd->input_file`, `cmd->output_file`). File redirections override pipeline descriptors if both are specified.
 - **Built-ins in Pipelines:** Built-in commands within pipelines execute in child processes (`run_builtin(cmd, 1)`), terminating with `_exit()`. This ensures that `cd` or `exit` inside a pipeline segment (e.g. `cd /tmp | cat` or `exit | cat`) does not alter the parent shell's working directory or terminate the parent REPL.
 - **Foreground Synchronization:** The parent waits for all foreground child processes using `waitpid()`. The exit status of the rightmost command stage is returned as the pipeline result.
-- **Background Execution:** If `pipeline->background` is set (`cmd &`), the parent prints `[background pid <pid>]`, flushes `stdout`, and returns `0` immediately without blocking.
+- **Background Execution:** If `pipeline->background` is set (`cmd &`), the parent prints `[background pid <pid>]` to `stdout`, flushes `stdout`, and returns `0` immediately without blocking.
 
 ---
 
@@ -123,7 +123,7 @@ The architecture defines four primary C interfaces:
 - `int shell_loop(void)`: Main REPL entry point. Repeatedly presents prompt, polls input and notifications, parses commands, executes pipelines, and shuts down cleanly.
 
 ### `include/parser.h`
-- `#define MAX_ARGS 128`: Maximum arguments supported per command.
+- `#define MAX_ARGS 128`: Maximum arguments after the command name (129 total `argv` entries, excluding the NULL terminator).
 - `#define MAX_PIPE_SEGMENTS 32`: Maximum supported pipeline command stages.
 - `int parse_line(const char *line, struct Pipeline *pipeline, char *error, size_t error_size)`: Tokenizes line, processes quotes/escapes, validates operator grammar, and populates AST.
 - `void free_pipeline(struct Pipeline *pipeline)`: Frees all dynamic memory in a pipeline (argv strings, redirection paths).
@@ -151,7 +151,7 @@ The table below catalogs all deviations between the Phase 1 Architectural Design
 | **Background Child Reaping** | Periodic reaping between prompts using `waitpid(-1, &status, WNOHANG)`. | Real-time asynchronous `SIGCHLD` handler writing to a non-blocking self-pipe, drained by `poll()` and reaped via `reap_background()`; concurrent reaping during foreground waits. | **Architectural Hardening:** Periodic-only reaping left zombie processes in the OS process table if the user remained idle at the prompt. The self-pipe trick ensures immediate zombie cleanup and instant feedback on `stderr` without risking signal-safety violations. | Implemented & verified (PR #28). FR-07 enhanced. |
 | **Pipeline Scale & Capacity** | Two-stage pipelines (`cmd1 \| cmd2`) illustrated in early design diagrams and test cases (TC-12). | Generic multi-stage pipeline executor supporting up to 32 concurrent stages (`MAX_PIPE_SEGMENTS = 32`). | **Capability Extension:** Extended from two stages to arbitrary pipelines up to 32 stages. Concurrent child execution and immediate closing of unused pipe ends prevents pipe buffer exhaustion and deadlocks on large data transfers (`seq 20000 \| wc -l`). | Implemented & verified (PR #27). FR-06 expanded. |
 | **Built-in Execution Isolation** | Initial high-level design described built-ins as executing within the shell process without distinguishing pipeline context. | Context-aware execution: single foreground built-in executes in parent (persisting `cd`/`exit`); built-ins in pipelines or background execute in child processes via `run_builtin(cmd, 1)` and `_exit()`. | **Architectural Refinement:** Conforms to POSIX pipeline isolation standards. Prevents child stages (e.g. `cd /tmp \| cat`) from inadvertently mutating parent working directory or terminating the parent interactive shell. | Implemented & verified (PR #27). FR-03 & FR-06 isolated. |
-| **Operator Pre-Validation** | Lexical parsing during AST construction, with syntax errors and redirection handling deferred to execution time. | Strict pre-validation pass in `src/parser.c` verifying operator counts (`&&`, duplicate `<`/`>`, misplaced `&`, boundary limits) before execution. | **Security & Robustness Hardening:** Satisfies NFR-07 (Security Hygiene). Rejection of malformed syntax occurs before any child processes are forked or any output files are truncated/created (`touch must-not-exist \| cat > rejected` creates no files). | Implemented & verified (PR #27). FR-04 & FR-08 hardened. |
+| **Operator Pre-Validation** | Lexical parsing during AST construction, with syntax errors and redirection handling deferred to execution time. | Strict pre-validation pass in `src/parser.c` verifying operator counts (`&&`, duplicate `<`/`>`, misplaced `&`, boundary limits) before execution. | **Security & Robustness Hardening:** Satisfies NFR-07 (Security Hygiene). Rejection of malformed syntax occurs before any child processes are forked or any output files are truncated/created (`touch must-not-exist \| cat > rejected > duplicate` is rejected before any files are created). | Implemented & verified (PR #27). FR-04 & FR-08 hardened. |
 
 ### Summary of Deviation Impact
-None of the architectural deviations represent an abandonment or compromise of original requirements. Instead, all five deviations represent **engineering refinements and hardening** beyond the initial design sketches, ensuring strict POSIX compliance, robust resource management, and zero zombie accumulation.
+None of the architectural deviations represent an abandonment or compromise of original requirements. Instead, all five deviations represent **engineering refinements and hardening** beyond the initial design sketches, using POSIX process and I/O APIs while preserving the limited shell syntax documented in the README. Full POSIX shell language compliance is not claimed; resource audit and regression acceptance remain tracked in issues #15 and #16.

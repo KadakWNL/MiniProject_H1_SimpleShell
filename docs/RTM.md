@@ -16,7 +16,7 @@ non-functional requirements are defined in `docs/Test_Cases.md`.
 | FR-04 | Command parsing | UC-02 | `src/parser.c` | TC-05, TC-06, TC-11 | Automated | SH-REQ-04 | Implemented; operator pre-validation accepted (#11) |
 | FR-05 | Input/output redirection | UC-06 | `src/parser.c`, `src/executor.c` | TC-07, TC-08, TC-09 | Automated | SH-REQ-05 | Implemented; accepted (#10) |
 | FR-06 | Pipelines | UC-07 | `src/parser.c`, `src/executor.c` | TC-12 | Automated | SH-REQ-06 | Implemented; two-stage verification accepted (#12), multi-stage acceptance pending (#13) |
-| FR-07 | Background execution | UC-08 | `src/parser.c`, `src/executor.c` | TC-13 | Automated | SH-REQ-07 | Implemented; background execution and asynchronous self-pipe reaping accepted (#14) |
+| FR-07 | Background execution | UC-08 | `src/shell.c`, `src/parser.c`, `src/executor.c` | TC-13 | Automated | SH-REQ-07 | Implemented; background execution and asynchronous self-pipe reaping accepted (#14) |
 | FR-08 | Error handling | UC-02, UC-09 | `src/shell.c`, `src/parser.c`, `src/executor.c`, `src/builtins.c` | TC-11, TC-14, TC-15 | Automated | SH-REQ-08 | Implemented; syntax verification accepted (#11) |
 | FR-09 | Process synchronization | UC-03, UC-04 | `src/executor.c` | TC-16 | Automated | SH-REQ-09 | Implemented; foreground synchronization accepted (#12) |
 | FR-10 | Clean termination | UC-10 | `src/shell.c`, `src/builtins.c` | TC-01, TC-10 | Automated | SH-REQ-10 | Implemented; accepted in Sprint 1 |

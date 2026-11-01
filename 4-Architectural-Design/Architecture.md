@@ -47,7 +47,7 @@ Lexer / Pre-validator (parser.c)
 
 1. **Local POSIX Execution:** External commands use `fork()` + `execvp()`, completely avoiding `system()` to prevent unintended shell interpolation.
 2. **Built-in Execution Contexts:** Solitary foreground built-ins execute in the shell parent process so that state changes (`cd`, `exit`) persist. Built-ins participating in pipelines execute within child processes (`child_exec`) to avoid mutating parent working directory or terminating the parent REPL.
-3. **Clean Output Separation:** Prompts and diagnostics are written strictly to `stderr`, keeping `stdout` clean for automated testing and stream redirection.
+3. **Clean Output Separation:** Prompts and completion diagnostics are written to `stderr`; background launch messages are written to `stdout`.
 4. **Real-time Asynchronous Reaping (Self-Pipe Trick):** Instead of relying solely on periodic checks between user commands, the shell registers a `SIGCHLD` signal handler that performs an async-signal-safe `write()` to an internal UNIX self-pipe (`sigchld_pipe`). The interactive loop monitors standard input and the self-pipe simultaneously using `poll()`, immediately reaping finished background processes and preventing zombie accumulation even during prolonged idle periods.
 5. **Operator Pre-Validation:** Syntax validation and operator bounds are validated before process creation or file redirection, guaranteeing that invalid commands produce zero file or process side-effects.
 

@@ -6,7 +6,7 @@ A lightweight Unix-like command-line interpreter written in C11 for Linux/POSIX 
 
 ## 1. Project Overview
 
-Simple Shell is an educational Unix-like command-line interpreter developed by Team H1 as a Software Engineering mini-project. The project was designed and implemented to provide a solid, modular, and POSIX-compliant shell environment that demonstrates core operating systems principles:
+Simple Shell is an educational Unix-like command-line interpreter developed by Team H1 as a Software Engineering mini-project. The project was designed and implemented to provide a modular shell built with POSIX process and I/O APIs that demonstrates core operating systems principles:
 
 - Interactive Read-Eval-Print Loop (REPL) and robust terminal I/O.
 - Process lifecycle management using `fork()`, `execvp()`, and `waitpid()`.
@@ -80,7 +80,7 @@ Upon startup, Simple Shell presents its interactive prompt on `stderr`:
 simple-shell$
 ```
 
-The shell is now ready to accept interactive commands. Prompts and background notifications are routed to standard error (`stderr`), keeping standard output (`stdout`) clean for automated testing and stream redirection.
+The shell is now ready to accept interactive commands. Prompts and background completion diagnostics are written to standard error (`stderr`). Background launch messages (`[background pid <pid>]`) are written to standard output (`stdout`).
 
 ---
 
@@ -88,7 +88,7 @@ The shell is now ready to accept interactive commands. Prompts and background no
 
 - **Interactive Command Loop:** Displays `simple-shell$ ` prompt, processes user input line-by-line, recovers gracefully from errors, and terminates cleanly on `exit` or End-of-File (EOF / `Ctrl-D`).
 - **Built-in Commands:**
-  - `cd [DIR]`: Change working directory. Supports `cd` (to `HOME`), `cd <path>`, and `cd -` (toggling to `OLDPWD`). Runs in the parent process to persist directory changes.
+  - `cd [DIR]`: Change working directory. Supports `cd` (to `HOME`), `cd <path>`, and `cd -` (toggling to `OLDPWD`). Runs in the parent process for a single foreground command; in a pipeline or background command, directory changes affect only the child.
   - `pwd`: Print the current working directory to standard output.
   - `echo [TEXT...]`: Print arguments separated by single spaces.
   - `help`: Display built-in command documentation and supported shell operators.
@@ -105,7 +105,7 @@ The shell is now ready to accept interactive commands. Prompts and background no
 - **Multi-Stage Pipelines (`|`):** Connects the standard output of each command stage to the standard input of the next stage using unidirectional pipes (`pipe()` and `dup2()`). Supports up to 32 concurrent pipeline stages and handles stream transfers larger than standard pipe buffers without deadlocking.
 - **Background Execution (`&`):** Commands ending with `&` execute asynchronously in the background. The shell prints `[background pid <pid>]` and immediately returns control to the interactive prompt.
 - **Asynchronous Background Zombie Reaping:** Uses a real-time `SIGCHLD` signal handler communicating via a self-pipe. The shell monitors standard input and child process notifications simultaneously using `poll()`, reaping finished background jobs and reporting exit status to `stderr` even while idle at the prompt or executing foreground commands.
-- **Strict Operator Pre-Validation:** Lexical pre-validation rejects duplicate background operators (`&&`, `& &`), misplaced `&`, multiple redirections, and dangling operators before command execution, ensuring that malformed command lines create no child processes and produce no spurious output files.
+- **Strict Operator Pre-Validation:** Lexical pre-validation rejects duplicate background operators (`&&`, `& &`), misplaced `&`, duplicate input or output redirections on one command, and dangling operators before command execution, ensuring that malformed command lines create no child processes and produce no spurious output files.
 
 ---
 
@@ -250,7 +250,7 @@ make clean
 ### Executed Test Targets
 
 The `make test` and `make asan-test` targets execute three complementary validation suites:
-1. **Parser Unit Tests (`tests/test_parser.c`):** 63 assertions verifying argument tokenization, quote and escape processing, boundary limits (32 vs 33 pipeline stages, 128 vs 129 arguments), rejected operator combinations, and leak-free memory lifecycle under repeated allocation/free cycles.
+1. **Parser Unit Tests (`tests/test_parser.c`):** 63 assertions verifying argument tokenization, quote and escape processing, boundary limits (32 vs 33 pipeline stages, 128 vs 129 arguments after the command name), rejected operator combinations, and leak-free memory lifecycle under repeated allocation/free cycles.
 2. **Direct Executor Tests (`tests/test_executor.c`):** 17 component tests verifying external and built-in pipeline execution, rightmost command exit status capture, waiting for both producer and consumer stages independently, pipe capacity stress testing (`seq 20000 | wc -l`), parent state isolation (`cd` in pipeline), foreground child reaping, and 100-cycle pipeline descriptor stress testing under a restricted 64-descriptor `rlimit`.
 3. **Shell Integration Tests (`tests/test_shell.sh`):** 60 end-to-end integration scenarios verifying clean termination (`exit` and EOF), stderr prompt output, built-in execution (`cd`, `pwd`, `echo`, `help`), redirection truncation and append, external command pipelines, syntax error recovery without command side-effects or file creation, foreground process synchronization, and non-blocking background execution with real-time asynchronous self-pipe reaping (140 total checks executed per build).
 

@@ -5,9 +5,10 @@
 **ETA:** 12th October 2026  
 **Status:** Published to GitHub Issues & Board
 
-Status snapshot: Sprint 1 issues and redirection (#10) are closed. Operator validation
-and two-stage pipeline verification (#11/#12) are in review in [PR #27](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/27).
-The [live board](https://github.com/orgs/SE-H1-SimpleShell/projects/2) is authoritative for subsequent status changes.
+Status snapshot: Sprint 1 issues and Sprint 2 issues #10, #11, #12, and #14 are closed.
+Operator validation and pipeline verification were merged in [PR #27](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/27),
+and background execution was merged in [PR #28](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/28).
+Consult the [live issues](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues) and [board](https://github.com/orgs/SE-H1-SimpleShell/projects/2) for subsequent changes; board cards may lag issue closure.
 
 ---
 
