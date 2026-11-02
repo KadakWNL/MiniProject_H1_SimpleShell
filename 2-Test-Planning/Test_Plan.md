@@ -31,13 +31,13 @@ From a clean checkout, run:
 
 `make test` includes escaped spaces, missing input files, foreground waiting,
 background non-blocking return, operator rejection before side effects, pipeline
-limits, and repeated two-stage pipeline descriptor checks. Direct executor tests
-verify waiting for both stages and foreground child reaping. See the
+limits, multi-stage pipelines (up to 32 stages), deadlock avoidance on large data transfers,
+and repeated pipeline descriptor checks. Direct executor tests verify multi-stage pipelines,
+waiting for intermediate and terminal stages, and foreground child reaping. See the
 [recorded validation](../docs/Test_Report.md) for suite results and limitations.
 
-Manual review remains necessary for interactive terminal behavior, background
-completion notifications/reaping, and the full regression/resource audit tracked
-by the remaining Sprint 2 stories. The tests do not inject system-call failures.
+Automated regression coverage addresses all functional requirements (FR-01 through FR-10)
+and quality verifications (NFRV-01 through NFRV-08). The tests do not inject system-call failures.
 
 ## Entry criteria
 - Source, headers and tests are checked out.

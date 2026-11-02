@@ -34,17 +34,16 @@ The following core and advanced features are merged into `main` and verified thr
 ### Sprint 2 (26th Oct – 30th Oct 2026) — In Progress
 - **Goal:** Advanced features (redirection, pipelines, background execution, self-pipe reaping), resource audit, full regression, documentation finalization, and 2-minute final demo video / freeze.
 - **Velocity:** 34 Story Points planned.
-  - **Completed & Merged (18 pts):**
-    - Issue #10 (`[S2-01] I/O Redirection Support`): Closed via PR #25.
-    - Issue #11 (`[S2-02] Advanced Operator Pre-Validation`): Closed via PR #27.
-    - Issue #12 (`[S2-03] Two-Stage Pipeline Implementation`): Closed via PR #27.
-    - Issue #14 (`[S2-05] Background Execution & Reaping`): Closed via PR #28.
-  - **In Progress / Remaining (16 pts):**
-    - Issue #13 (`[S2-04] Multi-Stage Pipeline Expansion & Deadlock Prevention`, 3 pts, @sudeeksh02): Implementation merged on `main`; pending issue acceptance.
-    - Issue #15 (`[S2-06] Comprehensive Resource Audit`, 3 pts, @Aqual456): Sanitizers and descriptor checks active; audit pending completion.
-    - Issue #16 (`[S2-07] Full Regression Testing & RTM Sync`, 5 pts, @sudeeksh02): Open.
-    - Issue #17 (`[S2-08] Documentation Finalization, Architecture Sync & Deviation Log`, 3 pts, @ShrikarDesai07): In progress under feature branch `docs/issue-17-documentation-finalization`.
-    - Issue #18 (`[S2-09] 2-Minute Final Demo Video, Release Tag & Freeze`, 2 pts, @sudeeksh02): Pending completion of remaining Sprint 2 stories.
+  - **Completed & Merged (21 pts):**
+    - Issue #10 (`[S2-01] I/O Redirection Support`, 5 pts): Closed via PR #25.
+    - Issue #11 (`[S2-02] Advanced Operator Pre-Validation`, 3 pts): Closed via PR #27.
+    - Issue #12 (`[S2-03] Two-Stage Pipeline Implementation`, 5 pts): Closed via PR #27.
+    - Issue #14 (`[S2-05] Background Execution & Reaping`, 5 pts): Closed via PR #28.
+    - Issue #17 (`[S2-08] Documentation Finalization, Architecture Sync & Deviation Log`, 3 pts): Closed via PR #29.
+  - **Completed in this branch; pending PR merge (8 pts):** Issues #13 and #16.
+  - **In Progress / Remaining (5 pts):**
+    - Issue #15 (`[S2-06] Comprehensive Resource Audit`, 3 pts, @Aqual456): Sanitizers and descriptor checks active; final audit report pending.
+    - Issue #18 (`[S2-09] 2-Minute Final Demo Video, Release Tag & Freeze`, 2 pts, @sudeeksh02): Pending final release video deliverable.
 
 ---
 
@@ -66,16 +65,15 @@ The following core and advanced features are merged into `main` and verified thr
 | [#10](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/10) | [S2-01] I/O Redirection Support (<, >, >>) | @ShrikarDesai07 | Closed | Merged via PR #25 |
 | [#11](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/11) | [S2-02] Advanced Operator Pre-Validation | @KadakWNL | Closed | Merged via PR #27 |
 | [#12](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/12) | [S2-03] Two-Stage Pipeline Implementation | @KadakWNL | Closed | Merged via PR #27 |
-| [#13](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/13) | [S2-04] Multi-Stage Pipeline Expansion | @sudeeksh02 | **Open** | Implemented on `main`; acceptance pending |
+| [#13](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/13) | [S2-04] Multi-Stage Pipeline Expansion | @sudeeksh02 | In PR | Multi-stage pipeline and deadlock prevention suite verified |
 | [#14](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/14) | [S2-05] Background Execution & Asynchronous Reaping | @Aqual456 | Closed | Merged via PR #28 |
 | [#15](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/15) | [S2-06] Comprehensive Resource Audit | @Aqual456 | **Open** | Active in CI; final audit report pending |
-| [#16](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/16) | [S2-07] Full Regression Testing & RTM Sync | @sudeeksh02 | **Open** | Automated suite active; formal review pending |
-| [#17](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/17) | [S2-08] Documentation Finalization & Architecture Sync | @ShrikarDesai07 | **In Progress** | Documentation in PR #29; see live review status |
+| [#16](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/16) | [S2-07] Full Regression Testing & RTM Sync | @sudeeksh02 | In PR | Full regression verified (161 checks/build), RTM synced, and Test Report updated |
+| [#17](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/17) | [S2-08] Documentation Finalization & Architecture Sync | @ShrikarDesai07 | Closed | Merged via PR #29 |
 | [#18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18) | [S2-09] 2-Minute Final Demo Video & Freeze | @sudeeksh02 | **Open** | Pending final release |
 
 ### Pull Request Status
-- **Merged Pull Requests:** PRs #20, #21, #22, #23, #24, #25, #26, #27, and #28 are merged into `main`.
-- **Documentation Review:** [PR #29](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/29) contains the documentation finalization for issue #17. Its live page records review and merge status.
+- **Merged Pull Requests:** PRs #20, #21, #22, #23, #24, #25, #26, #27, #28, and #29 are merged into `main`.
 - **Release Tags:** Final release acceptance and development freeze are tracked in [issue #18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18); check the live issue and repository tags for their current state.
 
 ---
@@ -98,7 +96,5 @@ The following core and advanced features are merged into `main` and verified thr
 
 ## 5. Remaining Work Prior to Project Freeze
 
-1. **Review and Merge Issue #17:** Complete teammate review and merge pull request for Issue #17 documentation finalization.
-2. **Acceptance of Issue #13:** Formally close Issue #13 for multi-stage pipeline expansion.
-3. **Complete Resource Audit & Regression Review (Issues #15 & #16):** Finalize Valgrind/descriptor audit records and verify full RTM coverage.
-4. **Final 2-Minute Demo Video & Tag (Issue #18):** Verify the linked demo deliverable and final release tag on `main`, complete acceptance, and freeze development.
+1. **Complete Resource Audit (Issue #15):** Finalize Valgrind and descriptor leak analysis records.
+2. **Final 2-Minute Demo Video & Tag (Issue #18):** Record and link the final 2-minute demonstration video, cut the release tag on `main`, complete final acceptance, and freeze development.
