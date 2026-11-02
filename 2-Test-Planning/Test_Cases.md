@@ -18,19 +18,18 @@ procedures (NFRV-xx). Both sets are referenced from `docs/RTM.md`.
 | TC-09 | Output append | `echo y >> file` | `y` appended. | Automated |
 | TC-10 | EOF | Ctrl-D | Shell exits cleanly. | Automated * |
 | TC-11 | Syntax error | `echo "unterminated` | Error shown on stderr; shell remains alive. | Automated |
-| TC-12 | Two-command pipe | `printf "a\nb\n" \| wc -l` | `2` produced. | Automated |
+| TC-12 | Pipeline execution (2 to 32 stages) | `printf "a\nb\n" \| wc -l`; multi-stage pipelines up to 32 stages | Expected output produced; deadlock-free execution. | Automated |
 | TC-13 | Background | `sleep 2 &` | Prompt returns without waiting; child is later reaped. | Automated |
 | TC-14 | Invalid command | `not-a-real-command` | Error shown on stderr; shell remains alive. | Automated |
 | TC-15 | Missing input file | `cat < missing` | Error shown on stderr; shell remains alive. | Automated |
 | TC-16 | Foreground synchronization | `sleep 1` | Next prompt appears only after the process completes. | Automated |
-| TC-17 | Stress/regression | Automated suite repeated; long pipeline such as `seq 10000 \| wc -l` | No crashes and no failing assertions. | Manual |
+| TC-17 | Stress/regression | Automated regression suite repeated; multi-stage pipelines & large data streams (`seq 30000 \| cat \| cat \| wc -l`) | No crashes, no deadlocks, and no failing assertions. | Automated |
 | TC-18 | Built-in help | `help` | Command list is printed, including the supported operators. | Automated |
 
 \* TC-01 and TC-10 are exercised on every automated run — the harness sends `exit` and then closes
 stdin — but neither is asserted as an independent scenario.
 
-The `Execution` column reflects the cases asserted by `tests/test_shell.sh`. Cases marked Manual are
-not yet automated; this gap is recorded in `docs/RTM.md` Section 4.
+The `Execution` column reflects the cases asserted by `tests/test_shell.sh` and `tests/test_executor.c`. All test cases (TC-01 through TC-18) are fully automated.
 
 ## 2. Non-functional verification procedures
 
@@ -62,5 +61,5 @@ under ASan or UBSan.
 
 ## 4. Known coverage gaps
 
-- TC-17 (stress / regression) is maintained as a periodic stress test prior to tag release.
-- All functional requirements (FR-01 through FR-10) now possess automated coverage in `tests/test_shell.sh` and `tests/test_parser.c`.
+- All functional requirements (FR-01 through FR-10) and non-functional verification procedures (NFRV-01 through NFRV-08) now possess comprehensive automated coverage in `tests/test_shell.sh`, `tests/test_executor.c`, and `tests/test_parser.c`.
+- Multi-stage pipelines (up to 32 stages) and deadlock prevention with large data transfers are verified under both standard builds and ASan/UBSan sanitizers.

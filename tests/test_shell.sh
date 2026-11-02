@@ -193,6 +193,39 @@ run_test "pipeline" $'printf "a\\nb\\nc\\n" | wc -l\nexit\n' "3"
 # Multi-stage pipeline execution (3 stages)
 run_test "three-stage pipeline" $'printf "alpha\\nbeta\\ngamma\\n" | grep -v beta | wc -l\nexit\n' "2"
 
+# Multi-stage pipeline execution (4 stages)
+run_test "four-stage pipeline" $'printf "delta\\nbeta\\nalpha\\ngamma\\n" | grep -v beta | sort | head -n 2\nexit\n' $'alpha\ndelta'
+
+# Multi-stage pipeline execution (5 stages)
+run_test "five-stage pipeline" $'printf "5\\n4\\n3\\n2\\n1\\n" | cat | sort -n | cat | wc -l\nexit\n' "5"
+
+# Multi-stage pipeline with built-in commands (middle/head/tail)
+run_test "multi-stage pipeline with builtin producer" $'echo multi-stage-echo | cat | cat\nexit\n' "multi-stage-echo"
+
+# Multi-stage pipeline combining input and output redirection
+printf "item1\nitem2\nitem3\nitem4\n" > "$TMP_DIR/ms_in.txt"
+input=$(printf 'cat < %s/ms_in.txt | grep -v item2 | wc -l > %s/ms_out.txt\ncat %s/ms_out.txt\nexit\n' "$TMP_DIR" "$TMP_DIR" "$TMP_DIR")
+run_test "multi-stage pipeline with input and output redirection" "$input" "3"
+
+# TC-17: Multi-stage pipeline deadlock prevention with large data stream (> 64KB pipe capacity)
+run_test "multi-stage pipeline deadlock prevention large transfer" $'seq 30000 | cat | cat | wc -l\nexit\n' "30000"
+
+# Multi-stage pipeline early consumer exit terminates without hang (SIGPIPE handling)
+run_test "multi-stage pipeline early consumer exit without deadlock" $'seq 50000 | cat | cat | head -n 3 | wc -l\nexit\n' "3"
+
+# Multi-stage pipeline built-in state isolation
+orig_pwd=$(pwd)
+actual_pwd=$(printf 'cd /tmp | cat | cat\npwd\nexit\n' | "$SHELL_BIN" 2>/dev/null)
+if [[ "$actual_pwd" == "$orig_pwd" ]]; then
+    printf 'PASS: multi-stage pipeline cd does not mutate parent directory\n'
+    PASS=$((PASS + 1))
+else
+    printf 'FAIL: multi-stage pipeline cd mutated parent directory (actual=%q, expected=%q)\n' "$actual_pwd" "$orig_pwd"
+    FAIL=$((FAIL + 1))
+fi
+
+run_test "multi-stage pipeline exit does not terminate parent" $'exit | cat | cat\necho alive-after-multistage-exit\nexit\n' "alive-after-multistage-exit"
+
 # Pipeline throughput under AddressSanitizer
 run_test "empty stream pipeline" $'cat /dev/null | wc -c\nexit\n' "0"
 
@@ -259,13 +292,15 @@ else
 fi
 
 # TC-16: Foreground process synchronization (previously manual)
-start_fg=$(date +%s)
-printf 'sleep 1\nexit\n' | "$SHELL_BIN" >/dev/null 2>&1
-dur_fg=$(( $(date +%s) - start_fg ))
-if [[ $dur_fg -ge 1 ]]; then
-    printf 'PASS: foreground process synchronization\n'; PASS=$((PASS + 1))
+rm -f "$TMP_DIR/sync_marker.txt"
+input=$(printf 'sh -c "sleep 0.5; echo finished > %s/sync_marker.txt"\ncat %s/sync_marker.txt\nexit\n' "$TMP_DIR" "$TMP_DIR")
+actual=$(printf '%s' "$input" | "$SHELL_BIN" 2>/dev/null)
+if [[ "$actual" == "finished" && -f "$TMP_DIR/sync_marker.txt" ]]; then
+    printf 'PASS: foreground process synchronization\n'
+    PASS=$((PASS + 1))
 else
-    printf 'FAIL: foreground process synchronization (waited %ds, expected >= 1s)\n' "$dur_fg"; FAIL=$((FAIL + 1))
+    printf 'FAIL: foreground process synchronization (actual=%q, expected="finished")\n' "$actual"
+    FAIL=$((FAIL + 1))
 fi
 
 # TC-13: Background non-blocking execution (previously manual)
@@ -285,11 +320,11 @@ bg_stderr="$TMP_DIR/bg_reap_stderr.txt"
 
 mkfifo "$fifo"
 
-"$SHELL_BIN" < "$fifo" > "$bg_stdout" 2> "$bg_stderr" &
-shell_pid=$!
-
 # Open FIFO read/write so the shell can start without blocking.
 exec 3<> "$fifo"
+
+"$SHELL_BIN" < "$fifo" > "$bg_stdout" 2> "$bg_stderr" &
+shell_pid=$!
 
 # Launch a background process and keep the shell idle.
 printf 'sleep 1 &\n' >&3
@@ -331,10 +366,12 @@ fi
 printf 'exit\n' >&3
 exec 3>&-
 wait "$shell_pid" || true
+rm -f "$fifo"
+mkfifo "$fifo"
 # Reaping must continue while a foreground pipeline is running.
+exec 3<> "$fifo"
 "$SHELL_BIN" < "$fifo" > "$bg_stdout" 2> "$bg_stderr" &
 shell_pid=$!
-exec 3<> "$fifo"
 printf 'sleep 1 &\nsleep 4 | sleep 4\nexit\n' >&3
 bg_pid=""
 for attempt in {1..30}; do
@@ -381,6 +418,23 @@ run_recovery_test "33-stage pipeline rejected before execution" \
     "$max_pipeline | cat"$'\necho recovered\nexit\n' "recovered" "pipeline is too long"
 run_test "quoted operators pass through builtin pipeline" \
     $'echo "|" "&" "<" ">" ">>" | cat\nexit\n' '| & < > >>'
+
+# TC-17: Full regression stress sequence: repeated multi-stage pipelines and redirections
+stress_suite_ok=1
+for i in {1..20}; do
+    out=$(printf 'echo round-%d | cat | cat\nexit\n' "$i" | "$SHELL_BIN" 2>/dev/null)
+    if [[ "$out" != "round-$i" ]]; then
+        stress_suite_ok=0
+        break
+    fi
+done
+if [[ $stress_suite_ok -eq 1 ]]; then
+    printf 'PASS: TC-17 multi-stage pipeline regression stress loop (20 cycles)\n'
+    PASS=$((PASS + 1))
+else
+    printf 'FAIL: TC-17 multi-stage pipeline regression stress loop failed\n'
+    FAIL=$((FAIL + 1))
+fi
 
 printf '\nTotal: %d passed, %d failed\n' "$PASS" "$FAIL"
 [[ $FAIL -eq 0 ]]
