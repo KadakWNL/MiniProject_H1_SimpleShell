@@ -175,6 +175,10 @@ static int run_single_parent_builtin(const struct Command *cmd) {
  * @param out_fd Output descriptor.
  */
 static void child_exec(const struct Command *cmd, int in_fd, int out_fd) {
+    if (cmd == NULL || cmd->argv[0] == NULL) {
+        _exit(0);
+    }
+
     if (in_fd != STDIN_FILENO) {
         if (dup2(in_fd, STDIN_FILENO) < 0) {
             fprintf(stderr, "shell: dup2 stdin: %s\n", strerror(errno));

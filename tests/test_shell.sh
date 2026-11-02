@@ -193,6 +193,39 @@ run_test "pipeline" $'printf "a\\nb\\nc\\n" | wc -l\nexit\n' "3"
 # Multi-stage pipeline execution (3 stages)
 run_test "three-stage pipeline" $'printf "alpha\\nbeta\\ngamma\\n" | grep -v beta | wc -l\nexit\n' "2"
 
+# Multi-stage pipeline execution (4 stages)
+run_test "four-stage pipeline" $'printf "delta\\nbeta\\nalpha\\ngamma\\n" | grep -v beta | sort | head -n 2\nexit\n' $'alpha\ndelta'
+
+# Multi-stage pipeline execution (5 stages)
+run_test "five-stage pipeline" $'printf "5\\n4\\n3\\n2\\n1\\n" | cat | sort -n | cat | wc -l\nexit\n' "5"
+
+# Multi-stage pipeline with built-in commands (middle/head/tail)
+run_test "multi-stage pipeline with builtin producer" $'echo multi-stage-echo | cat | cat\nexit\n' "multi-stage-echo"
+
+# Multi-stage pipeline combining input and output redirection
+printf "item1\nitem2\nitem3\nitem4\n" > "$TMP_DIR/ms_in.txt"
+input=$(printf 'cat < %s/ms_in.txt | grep -v item2 | wc -l > %s/ms_out.txt\ncat %s/ms_out.txt\nexit\n' "$TMP_DIR" "$TMP_DIR" "$TMP_DIR")
+run_test "multi-stage pipeline with input and output redirection" "$input" "3"
+
+# TC-17: Multi-stage pipeline deadlock prevention with large data stream (> 64KB pipe capacity)
+run_test "multi-stage pipeline deadlock prevention large transfer" $'seq 30000 | cat | cat | wc -l\nexit\n' "30000"
+
+# Multi-stage pipeline early consumer exit terminates without hang (SIGPIPE handling)
+run_test "multi-stage pipeline early consumer exit without deadlock" $'seq 50000 | cat | cat | head -n 3 | wc -l\nexit\n' "3"
+
+# Multi-stage pipeline built-in state isolation
+orig_pwd=$(pwd)
+actual_pwd=$(printf 'cd /tmp | cat | cat\npwd\nexit\n' | "$SHELL_BIN" 2>/dev/null)
+if [[ "$actual_pwd" == "$orig_pwd" ]]; then
+    printf 'PASS: multi-stage pipeline cd does not mutate parent directory\n'
+    PASS=$((PASS + 1))
+else
+    printf 'FAIL: multi-stage pipeline cd mutated parent directory (actual=%q, expected=%q)\n' "$actual_pwd" "$orig_pwd"
+    FAIL=$((FAIL + 1))
+fi
+
+run_test "multi-stage pipeline exit does not terminate parent" $'exit | cat | cat\necho alive-after-multistage-exit\nexit\n' "alive-after-multistage-exit"
+
 # Pipeline throughput under AddressSanitizer
 run_test "empty stream pipeline" $'cat /dev/null | wc -c\nexit\n' "0"
 
@@ -381,6 +414,23 @@ run_recovery_test "33-stage pipeline rejected before execution" \
     "$max_pipeline | cat"$'\necho recovered\nexit\n' "recovered" "pipeline is too long"
 run_test "quoted operators pass through builtin pipeline" \
     $'echo "|" "&" "<" ">" ">>" | cat\nexit\n' '| & < > >>'
+
+# TC-17: Full regression stress sequence: repeated multi-stage pipelines and redirections
+stress_suite_ok=1
+for i in {1..20}; do
+    out=$(printf 'echo round-%d | cat | cat\nexit\n' "$i" | "$SHELL_BIN" 2>/dev/null)
+    if [[ "$out" != "round-$i" ]]; then
+        stress_suite_ok=0
+        break
+    fi
+done
+if [[ $stress_suite_ok -eq 1 ]]; then
+    printf 'PASS: TC-17 multi-stage pipeline regression stress loop (20 cycles)\n'
+    PASS=$((PASS + 1))
+else
+    printf 'FAIL: TC-17 multi-stage pipeline regression stress loop failed\n'
+    FAIL=$((FAIL + 1))
+fi
 
 printf '\nTotal: %d passed, %d failed\n' "$PASS" "$FAIL"
 [[ $FAIL -eq 0 ]]

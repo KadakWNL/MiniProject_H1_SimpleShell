@@ -64,7 +64,7 @@ static int open_descriptors(void) {
 
 int main(void) {
     /* A leaked pipe writer or serial wait must fail rather than hang CI. */
-    alarm(20U);
+    alarm(30U);
     char output[2048];
     check(run("printf 'a\\nb\\n' | wc -l", output, sizeof(output)) == 0 &&
           strcmp(output, "2\n") == 0, "external producer and consumer");
@@ -86,6 +86,34 @@ int main(void) {
           "missing consumer returns 127 without hanging producer");
     check(run("definitely-not-a-command | cat", output, sizeof(output)) == 0 && output[0] == '\0',
           "missing producer closes writer so consumer sees EOF");
+
+    /* --- Multi-stage pipeline execution and deadlock prevention --- */
+    check(run("printf 'a\\nb\\nc\\n' | grep -v b | wc -l", output, sizeof(output)) == 0 &&
+          strcmp(output, "2\n") == 0, "three-stage pipeline external producer, filter, consumer");
+    check(run("printf 'gamma\\nalpha\\nbeta\\n' | sort | head -n 2 | wc -l", output, sizeof(output)) == 0 &&
+          strcmp(output, "2\n") == 0, "four-stage pipeline sorts and filters correctly");
+    check(run("echo initial | cat | cat", output, sizeof(output)) == 0 &&
+          strcmp(output, "initial\n") == 0, "three-stage pipeline with builtin producer");
+    check(run("printf 'line\\n' | cat | cat | wc -l", output, sizeof(output)) == 0 &&
+          strcmp(output, "1\n") == 0, "multi-stage pipeline with intermediate filters");
+    check(run("echo first | cat | echo third", output, sizeof(output)) == 0 &&
+          strcmp(output, "third\n") == 0, "multi-stage pipeline with builtin producer and consumer");
+    check(run("seq 50000 | cat | wc -l", output, sizeof(output)) == 0 &&
+          strcmp(output, "50000\n") == 0, "three-stage pipeline deadlock prevention on large data transfer");
+    check(run("yes | cat | head -n 1", output, sizeof(output)) == 0 &&
+          strcmp(output, "y\n") == 0, "three-stage early consumer termination closes pipe readers without hang");
+    check(run("printf test | cat | sh -c 'exit 42'", output, sizeof(output)) == 42,
+          "three-stage rightmost stage exit status propagated");
+    check(run("printf test | sh -c 'exit 19' | cat", output, sizeof(output)) == 0 &&
+          output[0] == '\0', "three-stage middle stage failure does not override rightmost success");
+
+    /* Maximum pipeline segment execution (32 stages) */
+    char max_stage_cmd[1024] = "echo max_stage";
+    for (int i = 1; i < MAX_PIPE_SEGMENTS; ++i) {
+        strcat(max_stage_cmd, " | cat");
+    }
+    check(run(max_stage_cmd, output, sizeof(output)) == 0 &&
+          strcmp(output, "max_stage\n") == 0, "32-stage pipeline executes successfully end-to-end");
 
     char *cwd = getcwd(NULL, 0);
     if (cwd == NULL) {
@@ -133,6 +161,18 @@ int main(void) {
         }
         fclose(file);
     }
+
+    /* Verify parent waits for intermediate stage in multi-stage pipeline */
+    (void)snprintf(command, sizeof(command),
+                   "true | sh -c 'sleep 0.1; echo done > %s' | true", marker);
+    rc = run(command, output, sizeof(output));
+    FILE *file = fopen(marker, "r");
+    int intermediate_completed = file != NULL && fgetc(file) == 'd';
+    if (file != NULL) {
+        fclose(file);
+    }
+    check(rc == 0 && intermediate_completed,
+          "waits for intermediate stage in three-stage pipeline");
     unlink(marker);
 
     struct rlimit original;
@@ -158,6 +198,16 @@ int main(void) {
     }
     check(stress_ok && before == open_descriptors(),
           "100 pipelines under 64-descriptor limit leave descriptor count unchanged");
+
+    int stress_4stage_ok = 1;
+    for (int cycle = 0; cycle < 50; ++cycle) {
+        if (run("echo x | cat | cat | cat > /dev/null", output, sizeof(output)) != 0 || output[0] != '\0') {
+            stress_4stage_ok = 0;
+            break;
+        }
+    }
+    check(stress_4stage_ok && before == open_descriptors(),
+          "50 4-stage pipelines under 64-descriptor limit leave descriptor count unchanged");
     if (setrlimit(RLIMIT_NOFILE, &original) != 0) {
         perror("restore descriptor limit");
         return 2;
