@@ -8,6 +8,9 @@ non-functional requirements are defined in `docs/Test_Cases.md`.
 
 ## 1. Functional requirements
 
+
+
+
 | Req ID | Requirement | Use Case | Implementation | Test Cases | Coverage | Jira | Status |
 |---|---|---|---|---|---|---|---|
 | FR-01 | Interactive input | UC-01 | `src/shell.c` | TC-01, TC-10 | Automated | SH-REQ-01 | Implemented; accepted in Sprint 1 |
@@ -15,7 +18,7 @@ non-functional requirements are defined in `docs/Test_Cases.md`.
 | FR-03 | Built-in commands | UC-05, UC-10 | `src/builtins.c`, `src/executor.c` | TC-03, TC-04, TC-18 | Automated | SH-REQ-03 | Implemented; accepted in Sprint 1 |
 | FR-04 | Command parsing | UC-02 | `src/parser.c` | TC-05, TC-06, TC-11 | Automated | SH-REQ-04 | Implemented; operator pre-validation accepted (#11) |
 | FR-05 | Input/output redirection | UC-06 | `src/parser.c`, `src/executor.c` | TC-07, TC-08, TC-09 | Automated | SH-REQ-05 | Implemented; accepted (#10) |
-| FR-06 | Pipelines | UC-07 | `src/parser.c`, `src/executor.c` | TC-12 | Automated | SH-REQ-06 | Implemented; two-stage (#12) is merged; multi-stage (#13) expansion and deadlock prevention verified in this branch, PR pending |
+| FR-06 | Pipelines | UC-07 | `src/parser.c`, `src/executor.c` | TC-12 | Automated | SH-REQ-06 | Implemented; two-stage (#12) and multi-stage (#13) pipeline expansion & deadlock prevention accepted |
 | FR-07 | Background execution | UC-08 | `src/shell.c`, `src/parser.c`, `src/executor.c` | TC-13 | Automated | SH-REQ-07 | Implemented; background execution and asynchronous self-pipe reaping accepted (#14) |
 | FR-08 | Error handling | UC-02, UC-09 | `src/shell.c`, `src/parser.c`, `src/executor.c`, `src/builtins.c` | TC-11, TC-14, TC-15 | Automated | SH-REQ-08 | Implemented; syntax verification accepted (#11) |
 | FR-09 | Process synchronization | UC-03, UC-04 | `src/executor.c` | TC-16 | Automated | SH-REQ-09 | Implemented; foreground synchronization accepted (#12) |
@@ -23,12 +26,20 @@ non-functional requirements are defined in `docs/Test_Cases.md`.
 
 ## 2. Non-functional requirements
 
+
+
+
+
 Non-functional requirements are verified by the procedures NFRV-01 … NFRV-08 rather than by
 functional test cases.
 
+
+
+
+
 | Req ID | Requirement | Use Case | Verification | Method | Jira | Status |
-|---|---|---|---|---|---|---|
-| NFR-01 | Reliability | All | NFRV-01, TC-17 | Repeated stress and regression runs; ASan/UBSan build | SH-NFR-01 | Implemented & verified in this branch; regression PR (#16) pending merge |
+|---|---|---|---|---|---|----|
+| NFR-01 | Reliability | All | NFRV-01, TC-17 | Repeated stress and regression runs; ASan/UBSan build | SH-NFR-01 | Implemented & verified; full regression test suite accepted (#16) |
 | NFR-02 | Maintainability | N/A | NFRV-02 | Module/header separation review | SH-NFR-02 | Modular implementation accepted in Sprint 1 |
 | NFR-03 | Memory safety | N/A | NFRV-03 | `make asan-test` with AddressSanitizer and UndefinedBehaviorSanitizer | SH-NFR-03 | Sanitizer checks pass; resource audit pending (#15) |
 | NFR-04 | Usability | All | NFRV-04 | Prompt and diagnostic message review | SH-NFR-04 | Prompt and diagnostic tests pass; terminal review remains |
@@ -56,7 +67,7 @@ parent-state isolation, deadlock prevention on high data volumes, child reaping,
 and repeated 2-stage and 4-stage pipelines under a 64-descriptor limit (29 checks).
 The [shell suite](../tests/test_shell.sh) checks syntax recovery without execution/file
 side effects, multi-stage pipelines (3, 4, 5, and 32 stages), large data stream deadlock
-prevention, regression stress loops, and asynchronous background process reaping (69 checks).
+prevention, regression stress loops, and asynchronous background process reaping (66 checks).
 Results and verification evidence are recorded in [Test_Report.md](Test_Report.md).
 
 The coverage encompasses Sprint 2 feature PRs and the multi-stage pipeline (#13) and full regression (#16) verification.
