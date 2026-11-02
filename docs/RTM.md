@@ -67,7 +67,7 @@ parent-state isolation, deadlock prevention on high data volumes, child reaping,
 and repeated 2-stage and 4-stage pipelines under a 64-descriptor limit (29 checks).
 The [shell suite](../tests/test_shell.sh) checks syntax recovery without execution/file
 side effects, multi-stage pipelines (3, 4, 5, and 32 stages), large data stream deadlock
-prevention, regression stress loops, and asynchronous background process reaping (66 checks).
+prevention, regression stress loops, and asynchronous background process reaping (69 checks).
 Results and verification evidence are recorded in [Test_Report.md](Test_Report.md).
 
 The coverage encompasses Sprint 2 feature PRs and the multi-stage pipeline (#13) and full regression (#16) verification.

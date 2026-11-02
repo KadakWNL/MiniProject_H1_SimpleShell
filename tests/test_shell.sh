@@ -292,13 +292,15 @@ else
 fi
 
 # TC-16: Foreground process synchronization (previously manual)
-start_fg=$(date +%s)
-printf 'sleep 1\nexit\n' | "$SHELL_BIN" >/dev/null 2>&1
-dur_fg=$(( $(date +%s) - start_fg ))
-if [[ $dur_fg -ge 1 ]]; then
-    printf 'PASS: foreground process synchronization\n'; PASS=$((PASS + 1))
+rm -f "$TMP_DIR/sync_marker.txt"
+input=$(printf 'sh -c "sleep 0.5; echo finished > %s/sync_marker.txt"\ncat %s/sync_marker.txt\nexit\n' "$TMP_DIR" "$TMP_DIR")
+actual=$(printf '%s' "$input" | "$SHELL_BIN" 2>/dev/null)
+if [[ "$actual" == "finished" && -f "$TMP_DIR/sync_marker.txt" ]]; then
+    printf 'PASS: foreground process synchronization\n'
+    PASS=$((PASS + 1))
 else
-    printf 'FAIL: foreground process synchronization (waited %ds, expected >= 1s)\n' "$dur_fg"; FAIL=$((FAIL + 1))
+    printf 'FAIL: foreground process synchronization (actual=%q, expected="finished")\n' "$actual"
+    FAIL=$((FAIL + 1))
 fi
 
 # TC-13: Background non-blocking execution (previously manual)
@@ -318,11 +320,11 @@ bg_stderr="$TMP_DIR/bg_reap_stderr.txt"
 
 mkfifo "$fifo"
 
-"$SHELL_BIN" < "$fifo" > "$bg_stdout" 2> "$bg_stderr" &
-shell_pid=$!
-
 # Open FIFO read/write so the shell can start without blocking.
 exec 3<> "$fifo"
+
+"$SHELL_BIN" < "$fifo" > "$bg_stdout" 2> "$bg_stderr" &
+shell_pid=$!
 
 # Launch a background process and keep the shell idle.
 printf 'sleep 1 &\n' >&3
@@ -364,10 +366,12 @@ fi
 printf 'exit\n' >&3
 exec 3>&-
 wait "$shell_pid" || true
+rm -f "$fifo"
+mkfifo "$fifo"
 # Reaping must continue while a foreground pipeline is running.
+exec 3<> "$fifo"
 "$SHELL_BIN" < "$fifo" > "$bg_stdout" 2> "$bg_stderr" &
 shell_pid=$!
-exec 3<> "$fifo"
 printf 'sleep 1 &\nsleep 4 | sleep 4\nexit\n' >&3
 bg_pid=""
 for attempt in {1..30}; do
