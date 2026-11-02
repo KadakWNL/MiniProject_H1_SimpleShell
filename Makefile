@@ -65,9 +65,10 @@ asan-test: clean
 ci: clean all test asan-test
 	@echo "All CI build, unit, integration, and sanitizer checks passed successfully."
 
-# Run optional Valgrind memory leak analysis against parser test harness
-valgrind: test_parser
+# Run Valgrind memory leak analysis against parser and executor test harnesses
+valgrind: test_parser test_executor
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./$(BUILD)/test_parser
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./$(BUILD)/test_executor
 
 # Print compiler and environment information for debugging and CI reporting
 info:

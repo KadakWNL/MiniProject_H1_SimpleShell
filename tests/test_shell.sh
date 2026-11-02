@@ -388,6 +388,63 @@ else
 fi
 exec 3>&-
 wait "$shell_pid" || true
+# TC-18: SIGTERM cleanup terminates and reaps background processes
+term_fifo="$TMP_DIR/sigterm_input.fifo"
+term_stdout="$TMP_DIR/sigterm_stdout.txt"
+term_stderr="$TMP_DIR/sigterm_stderr.txt"
+
+mkfifo "$term_fifo"
+
+# Keep the FIFO open so the shell can wait for input.
+exec 4<> "$term_fifo"
+
+"$SHELL_BIN" < "$term_fifo" > "$term_stdout" 2> "$term_stderr" &
+term_shell_pid=$!
+
+# Start a long-running background process.
+printf 'sleep 30 &\n' >&4
+
+term_bg_pid=""
+for attempt in {1..30}; do
+    term_bg_pid=$(sed -n 's/^\[background pid \([0-9][0-9]*\)\]$/\1/p' "$term_stdout" | head -n 1)
+    [[ -n "$term_bg_pid" ]] && break
+    sleep 0.1
+done
+
+if [[ -z "$term_bg_pid" ]]; then
+    printf 'FAIL: SIGTERM cleanup (could not capture background PID)\n'
+    FAIL=$((FAIL + 1))
+    kill -TERM "$term_shell_pid" 2>/dev/null || true
+    exec 4>&-
+    wait "$term_shell_pid" 2>/dev/null || true
+else
+    # Terminate the shell while it is idle.
+    kill -TERM "$term_shell_pid"
+
+    term_shell_status=0
+    wait "$term_shell_pid" || term_shell_status=$?
+
+    exec 4>&-
+
+    # Give the system a short time to reflect process termination.
+    for attempt in {1..30}; do
+        term_process_state=$(ps -o stat= -p "$term_bg_pid" 2>/dev/null || true)
+        [[ -z "$term_process_state" ]] && break
+        sleep 0.1
+    done
+
+    if [[ "$term_shell_status" -eq 143 && -z "$term_process_state" ]]; then
+        printf 'PASS: SIGTERM cleanup terminates and reaps background processes\n'
+        PASS=$((PASS + 1))
+    else
+        printf 'FAIL: SIGTERM cleanup (shell exit: %d, background process state: %s)\n' \
+            "$term_shell_status" "${term_process_state:-not running}"
+
+        # Prevent a failed test from leaving a background process behind.
+        kill -KILL "$term_bg_pid" 2>/dev/null || true
+        FAIL=$((FAIL + 1))
+    fi
+fi
 # A rejected line must neither launch an earlier stage nor create redirect files.
 for invalid in \
     "touch $TMP_DIR/must-not-exist | cat > $TMP_DIR/rejected-out > $TMP_DIR/rejected-other" \

@@ -30,6 +30,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Inspect and Verify GCC Compiler Environment
+        id: probe
         run: |
           echo "=== GCC Toolchain Information ==="
           gcc --version
@@ -41,6 +42,7 @@ jobs:
           echo "GCC C11 probe completed successfully."
 
       - name: Build Simple Shell (Standard GCC C11)
+        id: build
         timeout-minutes: 5
         run: |
           echo "Building simple-shell binary using standard compiler flags..."
@@ -48,12 +50,14 @@ jobs:
           make all
 
       - name: Execute Parser Unit Tests & Functional Shell Test Suite
+        id: tests
         timeout-minutes: 5
         run: |
           echo "Running unit tests and end-to-end integration test scenarios..."
           make test
 
       - name: Execute AddressSanitizer & UndefinedBehaviorSanitizer Checks
+        id: sanitizers
         timeout-minutes: 5
         env:
           ASAN_OPTIONS: 'detect_leaks=1:abort_on_error=1:symbolize=1:fast_unwind_on_malloc=0'
@@ -62,7 +66,23 @@ jobs:
           echo "Running full test suite under AddressSanitizer and UndefinedBehaviorSanitizer..."
           make asan-test
 
+      - name: Install Valgrind
+        id: valgrind_install
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y valgrind
+
+      - name: Execute Valgrind Resource Audit
+        id: valgrind
+        timeout-minutes: 5
+        run: |
+          echo "Running parser and executor tests under Valgrind..."
+          make clean
+          make valgrind
+
       - name: Verify Working Tree Cleanliness
+        id: cleanliness
         timeout-minutes: 2
         run: |
           echo "Cleaning build artifacts and verifying repository hygiene..."
@@ -72,14 +92,34 @@ jobs:
 
       - name: Publish CI Workflow Summary
         if: always()
+        env:
+          PROBE: ${{ steps.probe.outcome }}
+          BUILD: ${{ steps.build.outcome }}
+          TESTS: ${{ steps.tests.outcome }}
+          SANITIZERS: ${{ steps.sanitizers.outcome }}
+          VALGRIND_INSTALL: ${{ steps.valgrind_install.outcome }}
+          VALGRIND: ${{ steps.valgrind.outcome }}
+          CLEANLINESS: ${{ steps.cleanliness.outcome }}
         run: |
-          echo "### 🚀 CI Pipeline Execution Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| Check | Target | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|---|---|:---:|" >> $GITHUB_STEP_SUMMARY
-          echo "| GCC C11 Toolchain Probe | probe | ✅ Pass |" >> $GITHUB_STEP_SUMMARY
-          echo "| Standard Compilation | \`make all\` | ✅ Pass |" >> $GITHUB_STEP_SUMMARY
-          echo "| Parser & Integration Tests | \`make test\` | ✅ Pass |" >> $GITHUB_STEP_SUMMARY
-          echo "| Address & UB Sanitizers | \`make asan-test\` | ✅ Pass |" >> $GITHUB_STEP_SUMMARY
-          echo "| Cleanliness & Hygiene | \`make clean\` | ✅ Pass |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "All checks executed on \`ubuntu-latest\` with strict 5-minute step timeouts." >> $GITHUB_STEP_SUMMARY
+          status() {
+            case "$1" in
+              success) echo "Pass" ;;
+              failure) echo "Fail" ;;
+              cancelled) echo "Cancelled" ;;
+              skipped) echo "Skipped" ;;
+              *) echo "Unknown" ;;
+            esac
+          }
+
+          echo "### CI Pipeline Execution Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Check | Target | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|:---:|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| GCC C11 Toolchain Probe | probe | $(status "$PROBE") |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Standard Compilation | make all | $(status "$BUILD") |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Parser & Integration Tests | make test | $(status "$TESTS") |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Address & UB Sanitizers | make asan-test | $(status "$SANITIZERS") |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Valgrind Installation | apt-get install valgrind | $(status "$VALGRIND_INSTALL") |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Valgrind Resource Audit | make valgrind | $(status "$VALGRIND") |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cleanliness & Hygiene | make clean | $(status "$CLEANLINESS") |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Runner: ubuntu-latest. Statuses reflect the actual GitHub Actions step outcomes." >> "$GITHUB_STEP_SUMMARY"

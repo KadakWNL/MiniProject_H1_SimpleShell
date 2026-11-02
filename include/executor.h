@@ -37,4 +37,9 @@ int execute_pipeline(const struct Pipeline *pipeline);
  */
 void reap_background(void);
 
+/**
+ * @brief Terminate and wait for all remaining background child processes.
+ */
+void cleanup_background_jobs(void);
+
 #endif /* EXECUTOR_H */
