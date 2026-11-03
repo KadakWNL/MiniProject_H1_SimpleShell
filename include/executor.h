@@ -1,6 +1,10 @@
 #ifndef EXECUTOR_H
 #define EXECUTOR_H
 
+#include <signal.h>
+
+extern volatile sig_atomic_t executor_termination_requested;
+
 /**
  * @file executor.h
  * @brief Command execution engine, pipeline dispatch, and process lifecycle management.
@@ -36,5 +40,10 @@ int execute_pipeline(const struct Pipeline *pipeline);
  * prompt to prevent zombie process accumulation and report asynchronous completion.
  */
 void reap_background(void);
+
+/**
+ * @brief Terminate and wait for all remaining background child processes.
+ */
+void cleanup_background_jobs(void);
 
 #endif /* EXECUTOR_H */

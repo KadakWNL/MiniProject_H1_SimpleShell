@@ -17,6 +17,7 @@
 #include <unistd.h>
 
 static int sigchld_pipe[2] = {-1, -1};
+static volatile sig_atomic_t termination_requested = 0;
 static volatile sig_atomic_t sigchld_write_fd = -1;
 
 /**
@@ -32,6 +33,26 @@ static void handle_sigchld(int signal_number) {
 
     if (fd >= 0) {
         const char notification = 'C';
+        (void)write(fd, &notification, sizeof(notification));
+    }
+
+    errno = saved_errno;
+}
+
+/**
+ * @brief Request controlled shell termination.
+ */
+static void handle_sigterm(int signal_number) {
+    (void)signal_number;
+
+    int saved_errno = errno;
+    termination_requested = 1;
+    executor_termination_requested = 1;
+
+    int fd = (int)sigchld_write_fd;
+
+    if (fd >= 0) {
+        const char notification = 'T';
         (void)write(fd, &notification, sizeof(notification));
     }
 
@@ -58,26 +79,34 @@ static int configure_pipe_fd(int fd) {
 }
 
 /**
- * @brief Initialize the SIGCHLD notification pipe and handler.
+ * @brief Initialize child notifications and signal handlers.
  */
-static int initialize_child_notifications(struct sigaction *old_action) {
+static int initialize_child_notifications(
+    struct sigaction *old_action,
+    struct sigaction *old_term_action) {
+
     if (pipe(sigchld_pipe) < 0) {
         return -1;
     }
 
     if (configure_pipe_fd(sigchld_pipe[0]) < 0 ||
         configure_pipe_fd(sigchld_pipe[1]) < 0) {
+
         int saved_errno = errno;
+
         close(sigchld_pipe[0]);
         close(sigchld_pipe[1]);
+
         sigchld_pipe[0] = -1;
         sigchld_pipe[1] = -1;
+
         errno = saved_errno;
         return -1;
     }
 
     struct sigaction action;
     memset(&action, 0, sizeof(action));
+
     action.sa_handler = handle_sigchld;
     sigemptyset(&action.sa_mask);
     action.sa_flags = 0;
@@ -86,11 +115,38 @@ static int initialize_child_notifications(struct sigaction *old_action) {
 
     if (sigaction(SIGCHLD, &action, old_action) < 0) {
         int saved_errno = errno;
+
         sigchld_write_fd = -1;
+
         close(sigchld_pipe[0]);
         close(sigchld_pipe[1]);
+
         sigchld_pipe[0] = -1;
         sigchld_pipe[1] = -1;
+
+        errno = saved_errno;
+        return -1;
+    }
+
+    struct sigaction term_action;
+    memset(&term_action, 0, sizeof(term_action));
+
+    term_action.sa_handler = handle_sigterm;
+    sigemptyset(&term_action.sa_mask);
+    term_action.sa_flags = 0;
+
+    if (sigaction(SIGTERM, &term_action, old_term_action) < 0) {
+        int saved_errno = errno;
+
+        sigchld_write_fd = -1;
+        (void)sigaction(SIGCHLD, old_action, NULL);
+
+        close(sigchld_pipe[0]);
+        close(sigchld_pipe[1]);
+
+        sigchld_pipe[0] = -1;
+        sigchld_pipe[1] = -1;
+
         errno = saved_errno;
         return -1;
     }
@@ -99,11 +155,16 @@ static int initialize_child_notifications(struct sigaction *old_action) {
 }
 
 /**
- * @brief Restore the previous SIGCHLD handler and close notification descriptors.
+ * @brief Restore previous signal handlers and close notification descriptors.
  */
-static void cleanup_child_notifications(const struct sigaction *old_action) {
+static void cleanup_child_notifications(
+    const struct sigaction *old_action,
+    const struct sigaction *old_term_action) {
+
     sigchld_write_fd = -1;
+
     (void)sigaction(SIGCHLD, old_action, NULL);
+    (void)sigaction(SIGTERM, old_term_action, NULL);
 
     if (sigchld_pipe[0] >= 0) {
         close(sigchld_pipe[0]);
@@ -125,7 +186,7 @@ static void print_prompt(void) {
 }
 
 /**
- * @brief Drain pending SIGCHLD notifications.
+ * @brief Drain pending child notifications and reap terminated children.
  */
 static void process_child_notifications(void) {
     char buffer[128];
@@ -144,16 +205,14 @@ static void process_child_notifications(void) {
         break;
     }
 
-    /*
-     * Reap in normal program context, never inside the signal handler.
-     */
     reap_background();
 }
 
 /**
- * @brief Read one input line while monitoring child-process notifications.
+ * @brief Read one input line while monitoring child notifications.
  *
- * @return 1 for a complete line, 0 for EOF, or -1 for an input error.
+ * @return 1 for a complete line, 0 for EOF, -1 for an input error,
+ *         or -2 when SIGTERM requests termination.
  */
 static int read_command_line(char **line, size_t *capacity) {
     size_t length = 0U;
@@ -168,6 +227,10 @@ static int read_command_line(char **line, size_t *capacity) {
     }
 
     for (;;) {
+        if (termination_requested) {
+            return -2;
+        }
+
         struct pollfd descriptors[2];
 
         descriptors[0].fd = STDIN_FILENO;
@@ -188,8 +251,16 @@ static int read_command_line(char **line, size_t *capacity) {
             return -1;
         }
 
+        if (termination_requested) {
+            return -2;
+        }
+
         if (descriptors[1].revents & (POLLIN | POLLERR | POLLHUP)) {
             process_child_notifications();
+        }
+
+        if (termination_requested) {
+            return -2;
         }
 
         if (descriptors[0].revents & (POLLERR | POLLNVAL)) {
@@ -243,11 +314,16 @@ static int read_command_line(char **line, size_t *capacity) {
         }
     }
 
+    if (termination_requested) {
+        return -2;
+    }
+
     while (length > 0U && (*line)[length - 1U] == '\r') {
         --length;
     }
 
     (*line)[length] = '\0';
+
     return 1;
 }
 
@@ -258,21 +334,41 @@ int shell_loop(void) {
     char *line = NULL;
     size_t capacity = 0U;
     int running = 1;
-    struct sigaction old_action;
+    int exit_status = 0;
 
-    if (initialize_child_notifications(&old_action) < 0) {
-        fprintf(stderr, "shell: cannot initialize child notifications: %s\n",
+    struct sigaction old_action;
+    struct sigaction old_term_action;
+
+    termination_requested = 0;
+    executor_termination_requested = 0;
+
+    if (initialize_child_notifications(
+            &old_action, &old_term_action) < 0) {
+
+        fprintf(stderr,
+                "shell: cannot initialize child notifications: %s\n",
                 strerror(errno));
+
         free(line);
         return 1;
     }
 
     while (running) {
+        if (termination_requested) {
+            exit_status = 128 + SIGTERM;
+            break;
+        }
+
         reap_background();
         print_prompt();
 
         errno = 0;
         int read_result = read_command_line(&line, &capacity);
+
+        if (read_result == -2 || termination_requested) {
+            exit_status = 128 + SIGTERM;
+            break;
+        }
 
         if (read_result == 0) {
             fputc('\n', stderr);
@@ -286,6 +382,7 @@ int shell_loop(void) {
             }
 
             fprintf(stderr, "shell: input error: %s\n", strerror(errno));
+            exit_status = 1;
             break;
         }
 
@@ -302,6 +399,12 @@ int shell_loop(void) {
             continue;
         }
 
+        if (termination_requested) {
+            free_pipeline(&pipeline);
+            exit_status = 128 + SIGTERM;
+            break;
+        }
+
         int result = execute_pipeline(&pipeline);
 
         if (result == SHELL_STATUS_EXIT) {
@@ -312,7 +415,10 @@ int shell_loop(void) {
     }
 
     free(line);
-    cleanup_child_notifications(&old_action);
 
-    return 0;
+    cleanup_background_jobs();
+
+    cleanup_child_notifications(&old_action, &old_term_action);
+
+    return exit_status;
 }

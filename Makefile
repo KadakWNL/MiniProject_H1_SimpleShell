@@ -52,6 +52,7 @@ test: $(TARGET) test_parser test_executor
 	./$(BUILD)/test_executor
 	@echo "=== Running Shell Integration Test Suite ==="
 	bash tests/test_shell.sh ./$(TARGET)
+	python3 tests/test_termination.py
 
 # Build simple-shell binary with AddressSanitizer and UndefinedBehaviorSanitizer
 asan: clean
@@ -65,9 +66,11 @@ asan-test: clean
 ci: clean all test asan-test
 	@echo "All CI build, unit, integration, and sanitizer checks passed successfully."
 
-# Run optional Valgrind memory leak analysis against parser test harness
-valgrind: test_parser
+# Run Valgrind memory leak analysis against parser and executor test harnesses
+valgrind: $(TARGET) test_parser test_executor
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./$(BUILD)/test_parser
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./$(BUILD)/test_executor
+	printf 'echo audit | cat\nsleep 30 &\nexit\n' | valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./$(TARGET)
 
 # Print compiler and environment information for debugging and CI reporting
 info:
