@@ -20,28 +20,7 @@
 static pid_t background_pids[MAX_BACKGROUND_PIDS];
 static size_t background_pid_count = 0U;
 
-/**
- * @brief Wait for a specific child process, retrying if interrupted.
- *
- * @param pid Process ID to wait for.
- * @param status Optional pointer to receive the child exit status.
- * @return 0 on success, -1 on failure.
- */
-static int wait_for_pid(pid_t pid, int *status) {
-    for (;;) {
-        pid_t result = waitpid(pid, status, 0);
-
-        if (result == pid) {
-            return 0;
-        }
-
-        if (result < 0 && errno == EINTR) {
-            continue;
-        }
-
-        return -1;
-    }
-}
+volatile sig_atomic_t executor_termination_requested = 0;
 
 /**
  * @brief Reap all child processes that have already been spawned.
@@ -55,7 +34,11 @@ static void reap_spawned_children(const pid_t *pids, size_t count) {
 
     /* Mark all spawned children as requiring cleanup. */
     for (size_t i = 0U; i < count; ++i) {
+        if (pids[i] <= 0) {
+            continue;
+        }
         remaining[i] = 1;
+        (void)kill(-pids[i], SIGTERM);
         (void)kill(pids[i], SIGTERM);
     }
 
@@ -89,6 +72,7 @@ static void reap_spawned_children(const pid_t *pids, size_t count) {
     /* Force termination of children that did not exit. */
     for (size_t i = 0U; i < count; ++i) {
         if (remaining[i]) {
+            (void)kill(-pids[i], SIGKILL);
             (void)kill(pids[i], SIGKILL);
         }
     }
@@ -359,6 +343,10 @@ static int execute_children(const struct Pipeline *pipeline) {
         }
 
         if (pid == 0) {
+            if (pipeline->background || !isatty(STDIN_FILENO)) {
+                (void)setpgid(0, 0);
+            }
+            (void)signal(SIGTERM, SIG_DFL);
             int in_fd = previous_read;
             int out_fd = (i + 1U < pipeline->count)
                              ? pipe_fd[1]
@@ -372,6 +360,9 @@ static int execute_children(const struct Pipeline *pipeline) {
             _exit(126);
         }
 
+        if (pipeline->background || !isatty(STDIN_FILENO)) {
+            (void)setpgid(pid, pid);
+        }
         pids[pid_count++] = pid;
 
         if (previous_read != STDIN_FILENO) {
@@ -410,8 +401,18 @@ static int execute_children(const struct Pipeline *pipeline) {
     size_t remaining = pid_count;
 
     while (remaining > 0U) {
+        if (executor_termination_requested) {
+            reap_spawned_children(pids, pid_count);
+            return 128 + SIGTERM;
+        }
         int status = 0;
-        pid_t completed = waitpid(-1, &status, 0);
+        pid_t completed = waitpid(-1, &status, WNOHANG);
+
+        if (completed == 0) {
+            const struct timespec delay = {0, 10000000L};
+            (void)nanosleep(&delay, NULL);
+            continue;
+        }
 
         if (completed < 0) {
             if (errno == EINTR) {
@@ -445,6 +446,7 @@ static int execute_children(const struct Pipeline *pipeline) {
         }
 
         --remaining;
+        pids[stage] = 0;
 
         if (stage + 1U == pid_count) {
             if (WIFEXITED(status)) {
@@ -521,6 +523,7 @@ void cleanup_background_jobs(void) {
 
     /* First request graceful termination. */
     for (size_t i = 0U; i < background_pid_count; ++i) {
+        (void)kill(-background_pids[i], SIGTERM);
         (void)kill(background_pids[i], SIGTERM);
     }
 
@@ -558,6 +561,7 @@ void cleanup_background_jobs(void) {
 
     /* Force termination of any processes still running. */
     for (size_t i = 0U; i < background_pid_count; ++i) {
+        (void)kill(-background_pids[i], SIGKILL);
         (void)kill(background_pids[i], SIGKILL);
     }
 

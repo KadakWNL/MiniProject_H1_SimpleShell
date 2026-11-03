@@ -1,6 +1,10 @@
 #ifndef EXECUTOR_H
 #define EXECUTOR_H
 
+#include <signal.h>
+
+extern volatile sig_atomic_t executor_termination_requested;
+
 /**
  * @file executor.h
  * @brief Command execution engine, pipeline dispatch, and process lifecycle management.

@@ -47,6 +47,7 @@ static void handle_sigterm(int signal_number) {
 
     int saved_errno = errno;
     termination_requested = 1;
+    executor_termination_requested = 1;
 
     int fd = (int)sigchld_write_fd;
 
@@ -339,6 +340,7 @@ int shell_loop(void) {
     struct sigaction old_term_action;
 
     termination_requested = 0;
+    executor_termination_requested = 0;
 
     if (initialize_child_notifications(
             &old_action, &old_term_action) < 0) {
