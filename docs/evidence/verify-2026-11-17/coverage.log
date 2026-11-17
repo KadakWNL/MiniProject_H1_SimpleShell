@@ -1,0 +1,9 @@
+make clean
+make[1]: Entering directory '/mnt/d/Dev/simple-shell'
+rm -rf build simple-shell simple-shell.exe vgcore.* core.*
+make[1]: Leaving directory '/mnt/d/Dev/simple-shell'
+mkdir -p docs/evidence/coverage
+make CFLAGS='-std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -O0 --coverage' LDFLAGS='--coverage' test > docs/evidence/coverage/test.log 2>&1
+gcov --json-format --branch-probabilities --branch-counts -o build src/builtins.c src/executor.c src/main.c src/parser.c src/shell.c > docs/evidence/coverage/gcov.log
+mv *.gcov.json.gz docs/evidence/coverage/
+python3 tools/coverage_report.py

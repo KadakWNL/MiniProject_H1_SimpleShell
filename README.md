@@ -257,9 +257,9 @@ make clean
 
 The `make test` and `make asan-test` targets execute four complementary validation suites and harnesses:
 1. **Parser Unit Tests (`tests/test_parser.c`):** 63 assertions verifying argument tokenization, quote and escape processing, boundary limits (32 vs 33 pipeline stages, 128 vs 129 arguments after the command name), rejected operator combinations, and leak-free memory lifecycle under repeated allocation/free cycles.
-2. **Direct Executor Tests (`tests/test_executor.c`):** 29 component tests verifying external and built-in pipeline execution, multi-stage pipelines (3, 4, and 32 stages), rightmost command exit status capture, waiting for producer, intermediate, and consumer stages independently, pipe capacity deadlock prevention (`seq 50000 | cat | wc -l`), early consumer termination without deadlock, parent state isolation (`cd` in pipeline), foreground child reaping, and 100 2-stage and 50 4-stage pipeline descriptor stress testing under a restricted 64-descriptor `rlimit`.
+2. **Direct Executor Tests (`tests/test_executor.c`):** 45 component tests verifying external and built-in pipeline execution, multi-stage pipelines (3, 4, and 32 stages), rightmost command exit status capture, waiting for producer, intermediate, and consumer stages independently, pipe capacity deadlock prevention (`seq 50000 | cat | wc -l`), early consumer termination without deadlock, parent state isolation (`cd` in pipeline), foreground child reaping, 100 2-stage and 50 4-stage pipeline descriptor stress testing under a restricted 64-descriptor `rlimit`, built-in redirection restoration, out-of-order background reaping, and partial-pipeline `EMFILE` cleanup.
 3. **Shell Integration Tests (`tests/test_shell.sh`):** 70 end-to-end integration scenarios verifying clean termination (`exit` and EOF), stderr prompt output, built-in execution (`cd`, `pwd`, `echo`, `help`), redirection truncation and append, multi-stage pipelines (3, 4, 5, and 32 stages), pipelines combined with input/output redirections, syntax error recovery without command side-effects or file creation, foreground process synchronization, non-blocking background execution with real-time asynchronous self-pipe reaping, and `SIGTERM` background process cleanup.
-4. **Termination & Descendant Cleanup Harness (`tests/test_termination.py`):** 2 checks verifying that `SIGTERM` interrupts foreground waits, stops and reaps spawned descendants in both foreground and background modes, and exits with status `143` (**164 total checks** executed per build).
+4. **Termination & Descendant Cleanup Harness (`tests/test_termination.py`):** 4 checks verifying that `SIGTERM` interrupts foreground waits, stops and reaps spawned descendants in both foreground and background modes, covers children that ignore `SIGTERM`, and exits with status `143` (**182 total checks** executed per build).
 
 ---
 
@@ -291,6 +291,11 @@ MiniProject_H1_SimpleShell/
 │   ├── Resource_Audit.md              # Memory, descriptor, and termination resource audit
 │   ├── Test_Cases.md                  # Test case catalog and verification procedures
 │   ├── Test_Report.md                 # Recorded validation evidence and CI run logs
+│   ├── Unit_Test_Report.md            # Part-3 unit/component test report
+│   ├── System_Validation_Report.md    # Part-3 system validation report
+│   ├── Code_Coverage_Report.md        # Part-3 line coverage report
+│   ├── Branch_Coverage_Report.md      # Part-3 branch coverage report
+│   ├── evidence/                      # Raw logs, manifests, and gcov JSON evidence
 │   ├── Project_Status.md              # Live project status and deliverable tracking
 │   ├── Sprint_Backlog.md              # Sprint 1 and Sprint 2 backlog and story point allocation
 │   └── demos/                         # Demo video and verification evidence
@@ -305,7 +310,8 @@ MiniProject_H1_SimpleShell/
 ├── 9-Demo/
 ├── .github/workflows/                 # GitHub Actions CI automation
 │   └── ci.yml                         # Build, test, and sanitizer workflow definition
-├── Makefile                           # Build configuration and test targets
+├── Makefile                           # Build configuration; test, sanitizer, valgrind, and coverage targets
+├── tools/coverage_report.py           # gcov JSON to coverage report generator
 ├── CONTRIBUTING.md                    # Git workflow, PR conventions, review requirements
 └── README.md                          # Project overview and evaluator guide
 ```

@@ -24,10 +24,10 @@ do not introduce additional baseline requirement rows.
 | FR-04 | Command parsing | UC-02 | `src/parser.c` | TC-05, TC-06, TC-11 | Automated | SH-REQ-04 | Implemented; operator pre-validation accepted (#11) |
 | FR-05 | Input/output redirection | UC-06 | `src/parser.c`, `src/executor.c` | TC-07, TC-08, TC-09 | Automated | SH-REQ-05 | Implemented; accepted (#10) |
 | FR-06 | Pipelines | UC-07 | `src/parser.c`, `src/executor.c` | TC-12 | Automated | SH-REQ-06 | Implemented; two-stage (#12) and multi-stage (#13) pipeline expansion & deadlock prevention accepted |
-| FR-07 | Background execution | UC-08 | `src/shell.c`, `src/parser.c`, `src/executor.c` | TC-13 | Automated | SH-REQ-07 | Implemented; background execution and asynchronous self-pipe reaping accepted (#14) |
-| FR-08 | Error handling | UC-02, UC-09 | `src/shell.c`, `src/parser.c`, `src/executor.c`, `src/builtins.c` | TC-11, TC-14, TC-15 | Automated | SH-REQ-08 | Implemented; syntax verification accepted (#11) |
+| FR-07 | Background execution | UC-08 | `src/shell.c`, `src/parser.c`, `src/executor.c` | TC-13, TC-19 | Automated | SH-REQ-07 | Implemented; background execution and asynchronous self-pipe reaping accepted (#14) |
+| FR-08 | Error handling | UC-02, UC-09 | `src/shell.c`, `src/parser.c`, `src/executor.c`, `src/builtins.c` | TC-11, TC-14, TC-15, TC-21 | Automated | SH-REQ-08 | Implemented; syntax verification accepted (#11) |
 | FR-09 | Process synchronization | UC-03, UC-04 | `src/executor.c` | TC-16 | Automated | SH-REQ-09 | Implemented; foreground synchronization accepted (#12) |
-| FR-10 | Clean termination | UC-10 | `src/shell.c`, `src/builtins.c` | TC-01, TC-10 | Automated | SH-REQ-10 | Implemented; accepted in Sprint 1 |
+| FR-10 | Clean termination | UC-10 | `src/shell.c`, `src/builtins.c` | TC-01, TC-10, TC-19, TC-20 | Automated | SH-REQ-10 | Implemented; accepted in Sprint 1 |
 
 ## 2. Non-functional requirements
 
@@ -46,7 +46,7 @@ functional test cases.
 |---|---|---|---|---|---|----|
 | NFR-01 | Reliability | All | NFRV-01, TC-17 | Repeated stress and regression runs; ASan/UBSan build | SH-NFR-01 | Implemented & verified; full regression test suite accepted (#16) |
 | NFR-02 | Maintainability | N/A | NFRV-02 | Module/header separation review | SH-NFR-02 | Modular implementation accepted in Sprint 1 |
-| NFR-03 | Memory safety | N/A | NFRV-03 | `make asan-test` with AddressSanitizer and UndefinedBehaviorSanitizer | SH-NFR-03 | Sanitizer checks pass; resource audit accepted (#15, PR #32) |
+| NFR-03 | Memory safety | N/A | NFRV-03, TC-21 | `make asan-test` with AddressSanitizer and UndefinedBehaviorSanitizer | SH-NFR-03 | Sanitizer checks pass; resource audit accepted (#15, PR #32) |
 | NFR-04 | Usability | All | NFRV-04 | Prompt and diagnostic message review | SH-NFR-04 | Prompt and diagnostic tests pass; review complete |
 | NFR-05 | Portability | N/A | NFRV-05 | Build with GCC, C11, POSIX APIs on the target Linux system | SH-NFR-05 | Linux GCC C11 build and CI pass |
 | NFR-06 | Testability | N/A | NFRV-06 | CI runs `make test` on every push and pull request | SH-NFR-06 | Automated CI active; executor and shell coverage active |
@@ -69,15 +69,18 @@ functional test cases.
 rejected-input cleanup, and the 32/33-stage limit (63 checks). [Executor tests](../tests/test_executor.c)
 check multi-stage pipeline status, both-stage and intermediate-stage completion,
 parent-state isolation, deadlock prevention on high data volumes, child reaping,
-and repeated 2-stage and 4-stage pipelines under a 64-descriptor limit (29 checks).
+repeated 2-stage and 4-stage pipelines under a 64-descriptor limit, and the resource-failure and
+lifecycle cases behind TC-19 and TC-21 (45 checks).
 The [shell suite](../tests/test_shell.sh) checks syntax recovery without execution/file
 side effects, multi-stage pipelines (3, 4, 5, and 32 stages), large data stream deadlock
 prevention, regression stress loops, asynchronous background process reaping, and `SIGTERM`
 background cleanup (70 checks). The [termination harness](../tests/test_termination.py)
-verifies `SIGTERM` interruption of foreground waits and cleanup of background descendants
-(2 checks), bringing total automated checks to **164 checks per build** (`make test` and
-`make asan-test`). Results and verification evidence are recorded in
-[Test_Report.md](Test_Report.md) and [Resource_Audit.md](Resource_Audit.md).
+verifies `SIGTERM` interruption of foreground waits, cleanup of background descendants, and
+children that ignore `SIGTERM` (4 checks), bringing total automated checks to **182 checks per
+build** (`make test` and `make asan-test`). Results and verification evidence are recorded in
+[Test_Report.md](Test_Report.md) and [Resource_Audit.md](Resource_Audit.md), with the Part-3
+breakdown in the [Unit](Unit_Test_Report.md), [System Validation](System_Validation_Report.md),
+[Code Coverage](Code_Coverage_Report.md) and [Branch Coverage](Branch_Coverage_Report.md) reports.
 
 The coverage encompasses Sprint 2 feature PRs, multi-stage pipelines (#13), full regression (#16), and the resource audit (#15).
 
@@ -86,4 +89,4 @@ These are known and deliberately tracked prior to final freeze.
 | Gap | Affected | Note |
 |---|---|---|
 | System-call failure paths are not injected by tests | FR-08, FR-09 | `fork`, `pipe`, and `waitpid` failures still require targeted fault-injection coverage. |
-| Final release freeze and demo | NFR-08, Deliverables | Complete final 2-minute demo video and development freeze under #18. |
+| Joint final sign-off | NFR-08, Deliverables | Final recording merged via PR #34 (1:58.63) and #18 closed; joint review remains under #30. |

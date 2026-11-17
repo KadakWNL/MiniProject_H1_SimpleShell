@@ -1,0 +1,55 @@
+Tue Nov  3 12:40:33 PM UTC 2026
+Linux theVivobook 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 GNU/Linux
+PRETTY_NAME="Kali GNU/Linux Rolling"
+NAME="Kali GNU/Linux"
+VERSION_ID="2026.3"
+VERSION="2026.3"
+VERSION_CODENAME=kali-rolling
+ID=kali
+ID_LIKE=debian
+HOME_URL="https://www.kali.org/"
+SUPPORT_URL="https://forums.kali.org/"
+BUG_REPORT_URL="https://bugs.kali.org/"
+ANSI_COLOR="1;31"
+gcc (Debian 16.2.0-1) 16.2.0
+Copyright (C) 2026 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+gcov (Debian 16.2.0-1) 16.2.0
+JSON format version: 2
+Copyright (C) 2026 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+GNU Make 4.4.1
+Built for x86_64-pc-linux-gnu
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+GNU bash, version 5.3.9(1)-release (x86_64-pc-linux-gnu)
+Copyright (C) 2025 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Python 3.14.7
+valgrind-3.27.1
+859b43ea8847b9abff28b9ea2c537b4c593deb5e
+34cef9fa86ba710ef2bf5bdadbb87762d271b0b9c53e9a53cc0993882ecb9e52  src/builtins.c
+0671507965925c5169988a3891a61bbfb6a5d96f98b60061790cf178b0f3ddd3  src/executor.c
+4c28fb734dc5cb1b30336deb18e1bc494ceefffaab95b2fa7dc239a25a3eb00f  src/main.c
+d174b217caf8d7b2d9a07c7643975b9f2eec0d2b1488e78d51bf035ad01eab4b  src/parser.c
+d82fd8de28f9a8088a97b5cbb8d23c1754bb5e755ee006dc53bdf0a99cad3bd8  src/shell.c
+d27f9911bde95bd1b54538bf8c1929e6936a942a9fcccbc4fd65073c42f40dbd  include/builtins.h
+96b5393ca370de4f1e968e425c9b077c84a8f1dbaa1e22c1dfe45cbc5b5b0b37  include/executor.h
+69ad1c92dfa77ccdb8d813568a6fa69f42544cfbe002ccf28aaf02e87e2cbe48  include/parser.h
+32894e489dc8e100b05ab4a5108c83c17aed8c0fa32920a7be78571e7ae8c7e7  include/shell.h
+83054728c531eb79bf79a1d2cf0a478e3c379515d59bb471875fce36a7a73b2b  tests/test_executor.c
+9f790c5ec78d1efed833d8963245cdfee728996987eba167cc7b790215ecceba  tests/test_parser.c
+5c6576abcf688fd5c7d534d94035f01daee636dcf81ceefed4a8d585e2d63794  tests/test_sanitizers.sh
+dd27c911e551ad2bfb75def0b3d9b09fa318a04cb590083b4e2da611c0cc5962  tests/test_shell.sh
+5c492e175df1916594a88a1f90da10b00f194e069e7041b1de9d4c9c57d35663  tests/test_termination.py
+e895537ba28e0448f2821997f420116a763b99c3e94c1e3f04e123e723641cf1  Makefile
+5f879bed5db39ee4ead6027163280c7f35849a2d967118c415a63fe6804cd614  tools/coverage_report.py

@@ -14,7 +14,9 @@ multi-stage pipelines and regression in
 [PR #31](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/31), and the resource
 audit in [PR #32](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/32).
 
-The final demonstration/release check (#18) and the joint final review (#30) remain open. Sprint 3
+The final demonstration/release check (#18) is closed after
+[PR #34](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/34) merged the 1:58.63
+recording; the joint final review (#30) remains open. Sprint 3
 was closed on 9 November 2026 after its three spillover stories (#13, #15, #16) were accepted.
 Consult the [live issues](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues)
 and [board](https://github.com/orgs/SE-H1-SimpleShell/projects/2) for the current state.
@@ -65,9 +67,9 @@ and [board](https://github.com/orgs/SE-H1-SimpleShell/projects/2) for the curren
 | [#15](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/15) | [S2-06] Comprehensive Resource Audit: Sanitizers, Descriptors & Stress Safety | Testing & Quality | FR-10, NFR-01, NFR-03 | 3 | @Aqual456 | Done |
 | [#16](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/16) | [S2-07] Full Regression Testing, RTM Traceability Sync & Test Report | Testing & Quality | FR-01–10, NFR-01, NFR-04–07 | 5 | @sudeeksh02 | Done |
 | [#17](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/17) | [S2-08] Documentation Finalization, Architecture Sync & Deviation Log | Documentation & Release | NFR-02, NFR-08 | 3 | @ShrikarDesai07 | Done |
-| [#18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18) | [S2-09] 2-Minute Final Demo Video, Release Tag & Development Freeze | Documentation & Release | Deliverable 3.b, 3.d | 2 | @sudeeksh02 | Final check |
+| [#18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18) | [S2-09] 2-Minute Final Demo Video, Release Tag & Development Freeze | Documentation & Release | Deliverable 3.b, 3.d | 2 | @sudeeksh02 | Done (PR #34) |
 
-**Sprint 2 Velocity:** 34 Story Points (32 completed; the 2-point final demo/release check remains open)
+**Sprint 2 Velocity:** 34 Story Points (all 34 completed; #18 closed on 17 November 2026 after PR #34)
 
 **Sprint 3 (2nd Nov – 6th Nov 2026):** spillover stories #13, #15, and #16 were accepted and closed
 on 2–3 November; the milestone was closed on 9 November 2026 with 3 closed / 0 open issues.

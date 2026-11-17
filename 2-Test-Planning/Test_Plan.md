@@ -88,17 +88,17 @@ and deliverables. Section 5.1 is dedicated to security validation.
 
 | Feature | Requirements | Test coverage |
 |---|---|---|
-| Interactive prompt, EOF, and `exit` | FR-01, FR-10 | TC-01, TC-10 |
+| Interactive prompt, EOF, and `exit` | FR-01, FR-10 | TC-01, TC-10, TC-19, TC-20 |
 | External command execution and status | FR-02, FR-09 | TC-02, TC-16 |
 | Built-ins (`cd`, `pwd`, `echo`, `help`, `exit`) | FR-03 | TC-03, TC-04, TC-18 |
 | Tokenisation, quotes, escapes, operator validation | FR-04 | TC-05, TC-06, TC-11 |
 | Input/output redirection | FR-05 | TC-07, TC-08, TC-09 |
 | Pipelines, including built-in stages and 32-stage limit | FR-06 | TC-12 |
-| Background execution and reaping | FR-07 | TC-13 |
-| Diagnostics and recovery from malformed input | FR-08 | TC-11, TC-14, TC-15 |
+| Background execution and reaping | FR-07 | TC-13, TC-19 |
+| Diagnostics and recovery from malformed input | FR-08 | TC-11, TC-14, TC-15, TC-21 |
 | Reliability and stress behaviour | NFR-01 | NFRV-01, TC-17 |
 | Module/header separation | NFR-02 | NFRV-02 |
-| Memory and descriptor hygiene | NFR-03 | NFRV-03 |
+| Memory and descriptor hygiene | NFR-03 | NFRV-03, TC-21 |
 | Prompt and diagnostic usability | NFR-04 | NFRV-04 |
 | Linux/GCC C11 portability | NFR-05 | NFRV-05 |
 | CI testability | NFR-06 | NFRV-06 |
@@ -157,8 +157,8 @@ make test
 make asan-test
 ```
 
-`make test` runs the parser harness (63 assertions), executor harness (29 tests), shell integration suite (70 scenarios), and termination cleanup harness (`tests/test_termination.py`, 2 checks) — 164 checks per build. `make asan-test`
-rebuilds with `-fsanitize=address,undefined` and repeats the same 164 checks. Use `make asan-test`, not
+`make test` runs the parser harness (63 assertions), executor harness (45 tests), shell integration suite (70 scenarios), and termination cleanup harness (`tests/test_termination.py`, 4 checks) — 182 checks per build. The Part-3 expansion adds the lifecycle and resource-failure cases TC-19, TC-20, and TC-21; the executor and termination expansions are recorded in the [Unit Test Report](../docs/Unit_Test_Report.md) and [System Validation Report](../docs/System_Validation_Report.md). `make asan-test`
+rebuilds with `-fsanitize=address,undefined` and repeats the same 182 checks. Use `make asan-test`, not
 `make asan && make test`: `make asan` only produces a sanitized binary, and the following
 `make test` would rebuild without sanitizer flags, so nothing would actually be validated under
 ASan or UBSan.
@@ -319,10 +319,15 @@ as executed here.
 | Deliverable | Location | Status |
 |---|---|---|
 | Test Plan (this document) | `2-Test-Planning/Test_Plan.md` | Final |
-| Test Cases and NFR procedures | `2-Test-Planning/Test_Cases.md`, `docs/Test_Cases.md` | Final |
+| Test Cases and NFR procedures | `2-Test-Planning/Test_Cases.md`, `docs/Test_Cases.md` | Final (TC-01 … TC-21, NFRV-01 … NFRV-08) |
 | Validation and security specification | `2-Test-Planning/Validation_Specification.md` | Final |
 | Requirements Traceability Matrix | `docs/RTM.md` | Maintained |
 | Test Execution Report | `docs/Test_Report.md` | Recorded |
+| Unit Test Report | `docs/Unit_Test_Report.md` | Final |
+| System Validation Report | `docs/System_Validation_Report.md` | Final |
+| Code Coverage Report | `docs/Code_Coverage_Report.md` | Final (75.99% lines) |
+| Branch Coverage Report | `docs/Branch_Coverage_Report.md` | Final (69.27% branches) |
+| Coverage evidence and logs | `docs/evidence/` | Retained |
 | Resource audit report | `docs/Resource_Audit.md` | Recorded |
 | CI run logs and summaries | GitHub Actions `CI` workflow | Available |
 | Demo and acceptance evidence | `9-Demo/Demo_Evidence_Index.md` | Maintained |
@@ -335,7 +340,7 @@ as executed here.
 | NFR-01 … NFR-08 | NFRV-01 … NFRV-08 | `docs/Test_Report.md`, `docs/Resource_Audit.md` |
 | SR-01 … SR-04, SO-01 … SO-03 | SEC-01 … SEC-06 | `docs/Validation_Specification.md` Section 7, sanitizer and source-review evidence |
 
-The canonical row-by-row mapping is `docs/RTM.md`. The functional suite currently defines 18 test
+The canonical row-by-row mapping is `docs/RTM.md`. The functional suite currently defines 21 test
 cases and the non-functional suite defines 8 verification procedures, exceeding the 7–10 test-case
 minimum while covering every FR and NFR.
 

@@ -1,0 +1,35 @@
+File 'src/builtins.c'
+Lines executed:78.75% of 80
+Branches executed:92.86% of 56
+Taken at least once:67.86% of 56
+Calls executed:73.53% of 34
+
+Creating 'builtins.gcov.json.gz'
+File 'src/executor.c'
+Lines executed:56.83% of 278
+Branches executed:61.06% of 226
+Taken at least once:46.02% of 226
+Calls executed:35.54% of 121
+
+Creating 'executor.gcov.json.gz'
+File 'src/main.c'
+Lines executed:100.00% of 2
+No branches
+Calls executed:100.00% of 1
+
+Creating 'main.gcov.json.gz'
+File 'src/parser.c'
+Lines executed:80.06% of 321
+Branches executed:100.00% of 192
+Taken at least once:81.25% of 192
+Calls executed:79.31% of 87
+
+Creating 'parser.gcov.json.gz'
+File 'src/shell.c'
+Lines executed:73.27% of 202
+Branches executed:94.12% of 102
+Taken at least once:64.71% of 102
+Calls executed:73.47% of 49
+
+Creating 'shell.gcov.json.gz'
+Lines executed:71.12% of 883

@@ -304,13 +304,14 @@ else
 fi
 
 # TC-13: Background non-blocking execution (previously manual)
+# Use a long-lived job so this measures prompt return, not sanitizer startup cost.
 start_bg=$(date +%s)
-printf 'sleep 2 &\nexit\n' | "$SHELL_BIN" >/dev/null 2>&1
+printf 'sleep 30 &\nexit\n' | "$SHELL_BIN" >/dev/null 2>&1
 dur_bg=$(( $(date +%s) - start_bg ))
-if [[ $dur_bg -lt 2 ]]; then
+if [[ $dur_bg -lt 5 ]]; then
     printf 'PASS: background execution non-blocking\n'; PASS=$((PASS + 1))
 else
-    printf 'FAIL: background execution non-blocking (waited %ds, expected < 2s)\n' "$dur_bg"; FAIL=$((FAIL + 1))
+    printf 'FAIL: background execution non-blocking (waited %ds, expected < 5s)\n' "$dur_bg"; FAIL=$((FAIL + 1))
 fi
 
 # TC-17: Background child is asynchronously reaped while shell is idle

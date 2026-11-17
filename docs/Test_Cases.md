@@ -25,11 +25,13 @@ procedures (NFRV-xx). Both sets are referenced from `docs/RTM.md`.
 | TC-16 | Foreground synchronization | `sleep 1` | Next prompt appears only after the process completes. | Automated |
 | TC-17 | Stress/regression | Automated regression suite repeated; multi-stage pipelines & large data streams (`seq 30000 \| cat \| cat \| wc -l`) | No crashes, no deadlocks, and no failing assertions. | Automated |
 | TC-18 | Built-in help | `help` | Command list is printed, including the supported operators. | Automated |
+| TC-19 | SIGTERM lifecycle | Idle shell, busy foreground, background descendant, and foreground/background children that ignore `SIGTERM` | Exit status 143, bounded shutdown, and the tested children/descendants are no longer running | Automated (`tests/test_termination.py`) |
+| TC-20 | Exit with background work | Pipeline, then `sleep 30 &`, then `exit` | Shell exits with no live tracked direct child and no reported heap leak | Valgrind smoke (`make valgrind`) |
+| TC-21 | Partial pipeline pipe failure | Exhaust descriptor slots so the first `pipe()` succeeds but the second fails | Failure returned, earlier child reaped, descriptor count stable, next pipeline succeeds | Automated executor test |
 
-\* TC-01 and TC-10 are exercised on every automated run — the harness sends `exit` and then closes
-stdin — but neither is asserted as an independent scenario.
+TC-01 and TC-10 have explicit exit/status/prompt assertions in the shell harness. Piped EOF does not replace manual terminal Ctrl-D verification.
 
-The `Execution` column reflects the cases asserted by `tests/test_shell.sh` and `tests/test_executor.c`. All test cases (TC-01 through TC-18) are fully automated.
+The `Execution` column reflects the cases asserted by `tests/test_shell.sh`, `tests/test_executor.c`, `tests/test_parser.c`, and `tests/test_termination.py`. TC-01 through TC-19 and TC-21 are fully automated; TC-20 is a Valgrind smoke check.
 
 ## 2. Non-functional verification procedures
 
