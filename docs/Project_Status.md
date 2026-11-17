@@ -6,6 +6,7 @@
 - **Target Environment:** Linux / POSIX.1-2008
 - **Repository:** https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell
 - **Status date:** 12 November 2026
+- **Final demo merged:** 17 November 2026 (PR #34, issue #18 closed)
 - **Part-3 testing integration:** 17 November 2026 (test-only; production code unchanged)
 
 ---
@@ -24,8 +25,9 @@ The following core and advanced features are merged into `main` and verified thr
 - **Asynchronous Zombie Reaping:** `SIGCHLD` signal handler writing to an internal self-pipe, multiplexed with standard input via `poll()`, reaping background children and reporting termination diagnostics in real time without blocking.
 - **Operator Pre-Validation:** Syntax validation rejecting duplicate background operators (`&&`, `& &`), misplaced `&`, duplicate redirections, and limits before process spawning or file creation.
 
-Development is feature-complete and tagged `v1.0-final` (12 November 2026). The final demonstration
-evidence remains tracked in issue #18; the joint review and sign-off is tracked in issue #30.
+Development is feature-complete and tagged `v1.0-final` (12 November 2026). The final 1:58.63
+recording is merged on `main` via PR #34 (17 November 2026) and issue #18 is closed; the joint review
+and sign-off remains tracked in issue #30.
 
 ---
 
@@ -38,7 +40,7 @@ evidence remains tracked in issue #18; the joint review and sign-off is tracked 
 
 ### Sprint 2 (26th Oct – 30th Oct 2026) — Completed
 - **Goal:** Advanced features (redirection, pipelines, background execution, self-pipe reaping), resource audit, full regression, documentation finalization, and the final demo/release package.
-- **Velocity:** 34 Story Points planned; 32 points of development completed.
+- **Velocity:** 34 Story Points planned; all 34 completed (#18 closed 17 November 2026).
   - Issue #10 (`[S2-01]` I/O Redirection, 5 pts): closed via PR #25.
   - Issue #11 (`[S2-02]` Operator Pre-Validation, 3 pts): closed via PR #27.
   - Issue #12 (`[S2-03]` Two-Stage Pipeline, 5 pts): closed via PR #27.
@@ -47,12 +49,12 @@ evidence remains tracked in issue #18; the joint review and sign-off is tracked 
   - Issue #15 (`[S2-06]` Resource Audit, 3 pts): closed via PR #32.
   - Issue #16 (`[S2-07]` Full Regression & RTM Sync, 5 pts): closed via PR #31.
   - Issue #17 (`[S2-08]` Documentation Finalization, 3 pts): closed via PR #29.
-  - Issue #18 (`[S2-09]` Final Demo Video & Release, 2 pts): carried as a final check; video and release acceptance remain open.
+  - Issue #18 (`[S2-09]` Final Demo Video & Release, 2 pts): closed on 17 November 2026 after PR #34 merged the final 1:58.63 recording.
 
 ### Sprint 3 (2nd Nov – 6th Nov 2026) — Completed and closed
 - **Spillover:** #13, #15, and #16 were accepted and closed between 2 and 3 November 2026, ahead of the 6 November due date.
 - **Milestone:** closed on 9 November 2026 with 3 closed / 0 open issues.
-- **Final checks:** the remaining release and review work is tracked outside the sprint as #18 and #30.
+- **Final checks:** the remaining joint review work is tracked outside the sprint as #30.
 
 ---
 
@@ -79,14 +81,14 @@ evidence remains tracked in issue #18; the joint review and sign-off is tracked 
 | [#15](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/15) | [S2-06] Comprehensive Resource Audit | @Aqual456 | Closed | Merged via PR #32 |
 | [#16](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/16) | [S2-07] Full Regression Testing & RTM Sync | @sudeeksh02 | Closed | Merged via PR #31 |
 | [#17](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/17) | [S2-08] Documentation Finalization & Architecture Sync | @ShrikarDesai07 | Closed | Merged via PR #29 |
-| [#18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18) | [FinalChecks] 2-Minute Final Demo Video, Release Tag & Development Freeze | @sudeeksh02 | **Open** | Final demo and release acceptance |
+| [#18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18) | [FinalChecks] 2-Minute Final Demo Video, Release Tag & Development Freeze | @sudeeksh02 | Closed | Final recording merged via PR #34 (1:58.63) |
 | [#30](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/30) | [FinalChecks] Joint final project review and sign-off | @KadakWNL, @ShrikarDesai07 | **Open** | Joint final review |
 
 ### Pull Request Status
-- **Merged Pull Requests:** PRs #20, #21, #22, #23, #24, #25, #26, #27, #28, #29, #31, and #32 are merged into `main`.
+- **Merged Pull Requests:** PRs #20, #21, #22, #23, #24, #25, #26, #27, #28, #29, #31, #32, #33, and #34 are merged into `main`.
 - **Release Tags:** `v1.0-final` was tagged on `main` at commit `859b43e` on 12 November 2026 and
-  published as a GitHub release. Final demonstration acceptance remains tracked in
-  [issue #18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18).
+  published as a GitHub release. The final 1:58.63 recording is merged via PR #34; joint sign-off
+  remains tracked in [issue #30](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/30).
 - **Documentation restructure:** the IEEE-format SRS, Test Plan, and SAD restructure was merged to
   `main` via PR #33 on 12 November 2026.
 - **Part-3 testing package:** the expanded executor and termination harnesses, the four Part-3
@@ -104,7 +106,7 @@ evidence remains tracked in issue #18; the joint review and sign-off is tracked 
 | **Software Architecture & Design** | `docs/Architecture.md`, `4-Architectural-Design/Architecture.md` | **Finalized (IEEE 42010/1016)** | Stakeholders, views, security architecture, two sequence diagrams, error-handling protocols, deviation log. |
 | **Test Plan** | `2-Test-Planning/Test_Plan.md` | **Finalized (IEEE 829/29119-3)** | Sections 3–5 complete; security validation in Section 5.1. |
 | **Traceability Matrix** | `docs/RTM.md` | **Updated** | FR/NFR to use case, module, test, and tracking issue; SR/SO mapping note. |
-| **Test Cases & Procedures** | `docs/Test_Cases.md` | **Complete** | Functional test cases (TC-01..18) and non-functional procedures (NFRV-01..08). |
+| **Test Cases & Procedures** | `docs/Test_Cases.md` | **Complete** | Functional test cases (TC-01..21) and non-functional procedures (NFRV-01..08). |
 | **Test Execution Report** | `docs/Test_Report.md` | **Complete** | Recorded runs across parser, executor, shell integration, and termination cleanup suites (164 checks per build + Valgrind) with historical baseline retained; Part-3 expanded suite recorded separately (182 checks). |
 | **Unit Test Report** | `docs/Unit_Test_Report.md` | **Complete (Part-3)** | Parser and executor/component results across standard, sanitizer, and coverage builds. |
 | **System Validation Report** | `docs/System_Validation_Report.md` | **Complete (Part-3)** | End-to-end shell and SIGTERM lifecycle validation with disposition and limitations. |
@@ -114,13 +116,13 @@ evidence remains tracked in issue #18; the joint review and sign-off is tracked 
 | **Project Status** | `docs/Project_Status.md` | **Finalized** | Synchronized with live issues, PRs, and sprint status. |
 | **Sprint Backlog** | `docs/Sprint_Backlog.md` | **Synchronized** | Reflects completed Sprint 1/2/3 work and remaining final checks. |
 | **Architectural Diagrams** | `4-Architectural-Design/` | **Synchronized** | Component, use case, and two sequence diagrams with PlantUML sources. |
+| **Final Demo Video** | `docs/demos/se-compressed.mp4` | **Complete** | 1:58.63; merged on `main` via PR #34; issue #18 closed. |
 | **GitHub & Demo Evidence** | `5-GitHub-Jira-Evidence/screenshots/`, `9-Demo/screenshots/` | **Captured** | Repository, project table/board, sprint views, PRs, CI, release, and Sprint 1 output frames. |
 
 ---
 
 ## 5. Remaining Work Prior to Final Submission
 
-1. **Final 2-Minute Demo Video (Issue #18):** record and link the final demonstration; complete release acceptance.
-2. **Joint Final Review (Issue #30):** both reviewers sign off on the same final commit after #18 is closed.
-3. **Review the Part-3 testing branch:** approve and merge `part-3/integrate-testing-package` so the four reports and the 182-check suite land on `main`.
-4. **Refresh the demo evidence index:** attach the final recording and remaining screenshots.
+1. **Joint Final Review (Issue #30):** both reviewers sign off on the same final commit.
+2. **Review the Part-3 testing branch:** approve and merge `part-3/integrate-testing-package` so the four reports and the 182-check suite land on `main`.
+3. **Clean-clone verification:** build and run the full suite on the final `main` after both merges.

@@ -89,4 +89,4 @@ These are known and deliberately tracked prior to final freeze.
 | Gap | Affected | Note |
 |---|---|---|
 | System-call failure paths are not injected by tests | FR-08, FR-09 | `fork`, `pipe`, and `waitpid` failures still require targeted fault-injection coverage. |
-| Final release freeze and demo | NFR-08, Deliverables | Complete final 2-minute demo video and development freeze under #18. |
+| Joint final sign-off | NFR-08, Deliverables | Final recording merged via PR #34 (1:58.63) and #18 closed; joint review remains under #30. |
