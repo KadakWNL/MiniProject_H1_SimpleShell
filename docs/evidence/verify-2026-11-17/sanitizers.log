@@ -1,0 +1,217 @@
+rm -rf build simple-shell simple-shell.exe vgcore.* core.*
+make CFLAGS='-std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3' LDFLAGS='-fsanitize=address,undefined' test
+make[1]: Entering directory '/mnt/d/Dev/simple-shell'
+mkdir -p build
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3 -c src/builtins.c -o build/builtins.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3 -c src/executor.c -o build/executor.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3 -c src/main.c -o build/main.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3 -c src/parser.c -o build/parser.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3 -c src/shell.c -o build/shell.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3 build/builtins.o build/executor.o build/main.o build/parser.o build/shell.o -o simple-shell -fsanitize=address,undefined
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3 -c tests/test_parser.c -o build/test_parser.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3 build/test_parser.o build/parser.o -o build/test_parser -fsanitize=address,undefined
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3 -c tests/test_executor.c -o build/test_executor.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -fsanitize=address,undefined -fno-omit-frame-pointer -g3 build/test_executor.o build/executor.o build/parser.o build/builtins.o -o build/test_executor -fsanitize=address,undefined
+=== Running Parser Unit Tests ===
+./build/test_parser
+PASS: basic argument parsing
+PASS: double-quoted argument
+PASS: pipeline parsing
+PASS: redirection parsing
+PASS: append redirection parsing
+PASS: unterminated quote rejected
+PASS: leading pipe rejected
+PASS: trailing pipe rejected
+PASS: non-terminal background operator rejected
+PASS: single-quoted argument is literal
+PASS: single quotes do not process escapes
+PASS: backslash outside quotes escapes a space
+PASS: backslash escapes an operator
+PASS: double quotes escape an embedded quote
+PASS: empty double-quoted argument preserved
+PASS: empty single-quoted argument preserved
+PASS: unterminated single quote rejected
+PASS: trailing backslash rejected
+PASS: empty line ignored
+PASS: whitespace-only line ignored
+PASS: maximum of 128 arguments accepted
+PASS: 129th argument rejected
+PASS: NULL line parameter safely rejected
+PASS: NULL pipeline parameter safely rejected
+PASS: multiple input redirections rejected
+PASS: multiple output redirections rejected
+PASS: multiple append redirections rejected
+PASS: overwrite followed by append redirection rejected
+PASS: append followed by overwrite redirection rejected
+PASS: reversed order redirection (output then input) parsed correctly
+PASS: multiple background operators rejected
+PASS: dangling input redirection rejected
+PASS: dangling output redirection rejected
+PASS: dangling append redirection rejected
+PASS: consecutive pipes rejected
+PASS: double pipe operator rejected
+PASS: three-stage pipeline parsed successfully
+PASS: mixed quote embedding parsed correctly
+PASS: repeated parse-and-free lifecycle leak-free under ASan
+PASS: cat < a < b
+PASS: echo x > a > b
+PASS: echo x >> a > b
+PASS: echo x > a >> b
+PASS: echo x >> a >> b
+PASS: echo x | cat < a < b
+PASS: echo x | cat > a > b
+PASS: | cat
+PASS: echo x |
+PASS: echo x || cat
+PASS: echo x | | cat
+PASS: cat < | cat
+PASS: echo x >>> a
+PASS: echo x & cat
+PASS: echo x & | cat
+PASS: echo x &&
+PASS: echo x & &
+PASS: echo x & cat &
+PASS: &
+PASS: echo x | &
+PASS: 32 pipeline stages accepted
+PASS: 33 pipeline stages rejected and allocations released
+PASS: quoted and escaped operators remain arguments
+PASS: adjacent operators accepted without whitespace
+
+Parser tests: 0 failed
+=== Running Executor Tests ===
+./build/test_executor
+PASS: parent builtin accepts input redirection
+PASS: parent builtin combines input and output redirection
+shell: cannot open /: Is a directory
+PASS: output failure after input redirect returns failure
+shell: cannot open /tmp/simple-shell-input-uMwORO: No such file or directory
+PASS: parent builtin rejects missing input file
+PASS: stdin restored after successful and failed builtin redirects
+PASS: stdout restored after builtin redirect failures
+PASS: foreground signal maps to 128 plus signal
+[background pid 1436 terminated by signal 15]
+PASS: middle background job is reaped after signal
+PASS: out-of-order reaping preserves other background jobs
+[background pid 1435 terminated by signal 15]
+shell: pipe: Too many open files
+PASS: foreground command succeeds while background child is signal-terminated
+PASS: foreground wait reaps completed background job
+PASS: cleanup still tracks and reaps the last background job
+PASS: second pipe failure returns failure after spawning a stage
+PASS: pipe failure closes partial pipeline descriptors
+PASS: pipe failure terminates and reaps the already spawned stage
+PASS: executor recovers after pipe failure
+PASS: external producer and consumer
+PASS: builtin producer output is flushed
+PASS: builtin consumer supported
+PASS: both stages may be builtins
+PASS: concurrent stages transfer more than pipe capacity
+PASS: early consumer exit closes unused pipe readers
+PASS: rightmost stage determines pipeline status
+PASS: left failure does not override rightmost success
+shell: definitely-not-a-command: No such file or directory
+PASS: missing consumer returns 127 without hanging producer
+shell: definitely-not-a-command: No such file or directory
+PASS: missing producer closes writer so consumer sees EOF
+PASS: three-stage pipeline external producer, filter, consumer
+PASS: four-stage pipeline sorts and filters correctly
+PASS: three-stage pipeline with builtin producer
+PASS: multi-stage pipeline with intermediate filters
+PASS: multi-stage pipeline with builtin producer and consumer
+PASS: three-stage pipeline deadlock prevention on large data transfer
+PASS: three-stage early consumer termination closes pipe readers without hang
+PASS: three-stage rightmost stage exit status propagated
+PASS: three-stage middle stage failure does not override rightmost success
+PASS: 32-stage pipeline executes successfully end-to-end
+PASS: pipeline cd does not mutate parent directory
+PASS: pipeline exit does not terminate parent
+PASS: parent continues after child exit builtin
+PASS: waits for producer even when consumer exits first
+PASS: waits for consumer even when producer exits first
+PASS: waits for intermediate stage in three-stage pipeline
+PASS: 100 pipelines under 64-descriptor limit leave descriptor count unchanged
+PASS: 50 4-stage pipelines under 64-descriptor limit leave descriptor count unchanged
+PASS: all foreground children reaped
+
+Executor tests: 0 failed
+=== Running Shell Integration Test Suite ===
+bash tests/test_shell.sh ./simple-shell
+PASS: clean termination with exit
+PASS: clean termination on EOF
+PASS: clean termination on EOF after command
+PASS: prompt on stderr and clean stdout
+PASS: blank and whitespace-only input
+PASS: continued command processing after blank lines
+PASS: echo builtin
+PASS: echo multiple arguments
+PASS: quoted echo
+PASS: escaped space
+PASS: external command
+PASS: external command with formatted arguments
+PASS: help builtin
+PASS: input redirection
+PASS: combined input and output redirection
+PASS: output redirection
+PASS: external command output redirection
+PASS: built-in output redirection truncates existing file
+PASS: external command output redirection truncates existing file
+PASS: append redirection
+PASS: external command append redirection
+PASS: built-in output redirection emits no stdout
+PASS: external output redirection emits no stdout
+PASS: subsequent command stdout restored after builtin redirection
+PASS: subsequent command stdout restored after external redirection
+PASS: built-in output redirection to file
+PASS: repeated redirection stress (50 cycles) fd hygiene
+PASS: pipeline
+PASS: three-stage pipeline
+PASS: four-stage pipeline
+PASS: five-stage pipeline
+PASS: multi-stage pipeline with builtin producer
+PASS: multi-stage pipeline with input and output redirection
+PASS: multi-stage pipeline deadlock prevention large transfer
+PASS: multi-stage pipeline early consumer exit without deadlock
+PASS: multi-stage pipeline cd does not mutate parent directory
+PASS: multi-stage pipeline exit does not terminate parent
+PASS: empty stream pipeline
+PASS: invalid command recovery
+PASS: cd builtin
+PASS: cd - toggle to OLDPWD
+PASS: unterminated double quote recovery
+PASS: unterminated single quote recovery
+PASS: trailing backslash recovery
+PASS: dangling pipe recovery
+PASS: leading pipe recovery
+PASS: dangling redirection recovery
+PASS: redirection without command recovery
+PASS: recovery across blank lines and malformed syntax
+PASS: missing input file diagnostic and recovery
+PASS: failed external output redirection recovery
+PASS: failed output redirection inhibits built-in execution
+PASS: foreground process synchronization
+PASS: background execution non-blocking
+PASS: background launch immediately returns prompt
+PASS: background child asynchronously reaped while shell is idle
+PASS: background child reaped during foreground pipeline
+PASS: SIGTERM cleanup terminates and reaps background processes
+PASS: reject before execution: touch /tmp/simple-shell-test-cb9CV7/must-not-exist | cat > /tmp/simple-shell-test-cb9CV7/rejected-out > /tmp/simple-shell-test-cb9CV7/rejected-other
+PASS: reject before execution: touch /tmp/simple-shell-test-cb9CV7/must-not-exist | cat < a < b
+PASS: reject before execution: touch /tmp/simple-shell-test-cb9CV7/must-not-exist |
+PASS: reject before execution: touch /tmp/simple-shell-test-cb9CV7/must-not-exist || cat
+PASS: reject before execution: touch /tmp/simple-shell-test-cb9CV7/must-not-exist & echo unexpected
+PASS: reject before execution: touch /tmp/simple-shell-test-cb9CV7/must-not-exist &&
+PASS: reject before execution: touch /tmp/simple-shell-test-cb9CV7/must-not-exist & &
+PASS: malformed operators cause no command or redirection side effects
+PASS: 32-stage pipeline executes
+PASS: 33-stage pipeline rejected before execution
+PASS: quoted operators pass through builtin pipeline
+PASS: TC-17 multi-stage pipeline regression stress loop (20 cycles)
+
+Total: 70 passed, 0 failed
+python3 tests/test_termination.py
+PASS: SIGTERM cleanup, background=False, ignores_SIGTERM=False
+PASS: SIGTERM cleanup, background=True, ignores_SIGTERM=False
+PASS: SIGTERM cleanup, background=False, ignores_SIGTERM=True
+PASS: SIGTERM cleanup, background=True, ignores_SIGTERM=True
+make[1]: Leaving directory '/mnt/d/Dev/simple-shell'

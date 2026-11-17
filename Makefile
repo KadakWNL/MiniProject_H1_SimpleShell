@@ -14,7 +14,7 @@ OBJ     := $(patsubst src/%.c,$(BUILD)/%.o,$(SRC))
 SAN_CFLAGS  := $(CFLAGS) -fsanitize=address,undefined -fno-omit-frame-pointer -g3
 SAN_LDFLAGS := -fsanitize=address,undefined
 
-.PHONY: all clean test asan asan-test ci debug info valgrind help
+.PHONY: all clean test asan asan-test ci debug info valgrind help coverage
 
 # Default target: compile the simple-shell executable
 all: $(TARGET)
@@ -73,6 +73,14 @@ valgrind: $(TARGET) test_parser test_executor
 	printf 'echo audit | cat\nsleep 30 &\nexit\n' | valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./$(TARGET)
 
 # Print compiler and environment information for debugging and CI reporting
+coverage:
+	$(MAKE) clean
+	mkdir -p docs/evidence/coverage
+	$(MAKE) CFLAGS='$(CFLAGS) -O0 --coverage' LDFLAGS='--coverage' test > docs/evidence/coverage/test.log 2>&1
+	gcov --json-format --branch-probabilities --branch-counts -o $(BUILD) $(SRC) > docs/evidence/coverage/gcov.log
+	mv *.gcov.json.gz docs/evidence/coverage/
+	python3 tools/coverage_report.py
+
 info:
 	@echo "=== Build Environment Information ==="
 	@echo "Compiler: $(CC)"
@@ -95,5 +103,6 @@ help:
 	@echo "  make asan-test  - Run full test suite under AddressSanitizer and UBSan"
 	@echo "  make ci         - Execute full CI pipeline locally (clean, test, asan-test)"
 	@echo "  make valgrind   - Run Valgrind leak detection on unit test harness"
+	@echo "  make coverage   - Measure production line and branch coverage and write reports"
 	@echo "  make clean      - Remove build directory and compiled binaries"
 	@echo "  make info       - Display compiler version and configuration flags"

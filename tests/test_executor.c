@@ -11,7 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/resource.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 static int failures = 0;
@@ -50,6 +52,16 @@ static int run(const char *line, char *output, size_t size) {
     }
 
     int result = execute_pipeline(&pipeline);
+
+    struct stat expected_stdout;
+    struct stat actual_stdout;
+    if (fstat(fileno(capture), &expected_stdout) != 0 ||
+        fstat(STDOUT_FILENO, &actual_stdout) != 0 ||
+        expected_stdout.st_dev != actual_stdout.st_dev ||
+        expected_stdout.st_ino != actual_stdout.st_ino) {
+        fprintf(stderr, "FAIL: executor did not restore stdout\n");
+        exit(2);
+    }
 
     (void)fflush(stdout);
 
@@ -108,9 +120,186 @@ static int open_descriptors(void) {
     return count - 1;
 }
 
+static pid_t background(const char *command) {
+    char output[2048];
+    long pid = -1;
+    if (run(command, output, sizeof(output)) != 0 ||
+        sscanf(output, "[background pid %ld]", &pid) != 1 || pid <= 0) {
+        fprintf(stderr, "could not start background fixture\n");
+        exit(2);
+    }
+    /* Do not signal a Valgrind fork child before it has exec'd the fixture. */
+    char proc_path[80];
+    (void)snprintf(proc_path, sizeof(proc_path), "/proc/%ld/exe", pid);
+    for (int attempt = 0; attempt < 1000; ++attempt) {
+        char executable[1024];
+        ssize_t length = readlink(proc_path, executable, sizeof(executable) - 1U);
+        if (length > 0) {
+            executable[(size_t)length] = '\0';
+            const char *base = strrchr(executable, '/');
+            if (base != NULL && strcmp(base + 1, "sleep") == 0) {
+                return (pid_t)pid;
+            }
+        }
+        const struct timespec delay = {0, 10000000L};
+        (void)nanosleep(&delay, NULL);
+    }
+    (void)kill((pid_t)pid, SIGKILL);
+    fprintf(stderr, "background sleep did not reach exec readiness\n");
+    exit(2);
+}
+
+/* Observe a completed child without consuming its status: the executor must reap it. */
+static void await_exit(pid_t pid) {
+    siginfo_t info;
+    int result;
+    do {
+        result = waitid(P_PID, (id_t)pid, &info, WEXITED | WNOWAIT);
+    } while (result < 0 && errno == EINTR);
+    if (result < 0) {
+        perror("waitid fixture");
+        exit(2);
+    }
+}
+
+static void check_reaped(pid_t pid, const char *name) {
+    int status;
+    errno = 0;
+    check(waitpid(pid, &status, WNOHANG) == -1 && errno == ECHILD, name);
+}
+
+static void test_resource_failure(void) {
+    struct rlimit original;
+    if (getrlimit(RLIMIT_NOFILE, &original) != 0) {
+        perror("getrlimit");
+        exit(2);
+    }
+    struct rlimit limited = original;
+    if (limited.rlim_cur > 64U) {
+        limited.rlim_cur = 64U;
+    }
+    if (setrlimit(RLIMIT_NOFILE, &limited) != 0) {
+        perror("setrlimit");
+        exit(2);
+    }
+    const int before = open_descriptors();
+    struct Pipeline pipeline;
+    char error[256];
+    if (parse_line("sleep 30 | cat | cat", &pipeline, error, sizeof(error)) != 0) {
+        exit(2);
+    }
+    int descriptors[64];
+    size_t count = 0U;
+    int fd;
+    while ((fd = open("/dev/null", O_RDONLY)) >= 0 && count < 64U) {
+        descriptors[count++] = fd;
+    }
+    if (errno != EMFILE || count < 2U) {
+        fprintf(stderr, "could not exhaust descriptor fixture\n");
+        exit(2);
+    }
+    /* Two slots permit the first pipe/fork; only one slot remains for pipe #2. */
+    close(descriptors[--count]);
+    close(descriptors[--count]);
+    const int result = execute_pipeline(&pipeline);
+    while (count > 0U) {
+        close(descriptors[--count]);
+    }
+    free_pipeline(&pipeline);
+    check(result == 1, "second pipe failure returns failure after spawning a stage");
+    check(before >= 0 && open_descriptors() == before,
+          "pipe failure closes partial pipeline descriptors");
+    int status;
+    errno = 0;
+    check(waitpid(-1, &status, WNOHANG) == -1 && errno == ECHILD,
+          "pipe failure terminates and reaps the already spawned stage");
+    if (setrlimit(RLIMIT_NOFILE, &original) != 0) {
+        perror("restore descriptor limit");
+        exit(2);
+    }
+    char output[64];
+    check(run("echo recovered | cat", output, sizeof(output)) == 0 &&
+          strcmp(output, "recovered\n") == 0, "executor recovers after pipe failure");
+}
+
+static void test_lifecycle_and_redirection(void) {
+    char output[2048];
+    char input[] = "/tmp/simple-shell-input-XXXXXX";
+    int input_fd = mkstemp(input);
+    if (input_fd < 0 || write(input_fd, "sentinel\n", 9U) != 9) {
+        perror("input fixture");
+        exit(2);
+    }
+    int saved_stdin = dup(STDIN_FILENO);
+    if (saved_stdin < 0 || lseek(input_fd, 0, SEEK_SET) < 0 ||
+        dup2(input_fd, STDIN_FILENO) < 0) {
+        exit(2);
+    }
+    close(input_fd);
+    char command[1024];
+    (void)snprintf(command, sizeof(command), "echo input < %s", "/dev/null");
+    check(run(command, output, sizeof(output)) == 0 && strcmp(output, "input\n") == 0,
+          "parent builtin accepts input redirection");
+    char redirected[] = "/tmp/simple-shell-output-XXXXXX";
+    int out_fd = mkstemp(redirected);
+    if (out_fd < 0) {
+        exit(2);
+    }
+    close(out_fd);
+    (void)snprintf(command, sizeof(command), "echo combined < %s > %s", "/dev/null", redirected);
+    int result = run(command, output, sizeof(output));
+    FILE *file = fopen(redirected, "r");
+    char contents[32] = {0};
+    if (file != NULL) {
+        (void)fgets(contents, sizeof(contents), file);
+        fclose(file);
+    }
+    check(result == 0 && output[0] == '\0' && strcmp(contents, "combined\n") == 0,
+          "parent builtin combines input and output redirection");
+    unlink(redirected);
+    (void)snprintf(command, sizeof(command), "echo failure < %s > /", "/dev/null");
+    check(run(command, output, sizeof(output)) == 1,
+          "output failure after input redirect returns failure");
+    unlink(input);
+    (void)snprintf(command, sizeof(command), "echo failure < %s", input);
+    check(run(command, output, sizeof(output)) == 1,
+          "parent builtin rejects missing input file");
+    char sentinel[10] = {0};
+    check(read(STDIN_FILENO, sentinel, 9U) == 9 && strcmp(sentinel, "sentinel\n") == 0,
+          "stdin restored after successful and failed builtin redirects");
+    if (dup2(saved_stdin, STDIN_FILENO) < 0) {
+        exit(2);
+    }
+    close(saved_stdin);
+    check(run("echo restored", output, sizeof(output)) == 0 &&
+          strcmp(output, "restored\n") == 0, "stdout restored after builtin redirect failures");
+
+    check(run("sh -c 'kill -TERM $$'", output, sizeof(output)) == 128 + SIGTERM,
+          "foreground signal maps to 128 plus signal");
+    pid_t first = background("sleep 300 &");
+    pid_t second = background("sleep 300 &");
+    pid_t third = background("sleep 300 &");
+    (void)kill(second, SIGTERM);
+    await_exit(second);
+    reap_background();
+    check_reaped(second, "middle background job is reaped after signal");
+    check(kill(first, 0) == 0 && kill(third, 0) == 0,
+          "out-of-order reaping preserves other background jobs");
+    (void)kill(first, SIGTERM);
+    await_exit(first);
+    check(run("sleep 0.02", output, sizeof(output)) == 0,
+          "foreground command succeeds while background child is signal-terminated");
+    check_reaped(first, "foreground wait reaps completed background job");
+    cleanup_background_jobs();
+    check_reaped(third, "cleanup still tracks and reaps the last background job");
+}
+
 int main(void) {
     /* A leaked pipe writer or serial wait must fail rather than hang CI. */
-    alarm(30U);
+    alarm(120U);
+
+    test_lifecycle_and_redirection();
+    test_resource_failure();
 
     char output[2048];
 

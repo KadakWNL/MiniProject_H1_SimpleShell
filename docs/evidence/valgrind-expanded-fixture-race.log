@@ -1,0 +1,121 @@
+mkdir -p build
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -c src/builtins.c -o build/builtins.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -c src/executor.c -o build/executor.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -c src/main.c -o build/main.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -c src/parser.c -o build/parser.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -c src/shell.c -o build/shell.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude build/builtins.o build/executor.o build/main.o build/parser.o build/shell.o -o simple-shell 
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -c tests/test_parser.c -o build/test_parser.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude build/test_parser.o build/parser.o -o build/test_parser 
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude -c tests/test_executor.c -o build/test_executor.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes -g -Iinclude build/test_executor.o build/executor.o build/parser.o build/builtins.o -o build/test_executor 
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./build/test_parser
+==45809== Memcheck, a memory error detector
+==45809== Copyright (C) 2002-2026, and GNU GPL'd, by Julian Seward et al.
+==45809== Using Valgrind-3.27.1 and LibVEX; rerun with -h for copyright info
+==45809== Command: ./build/test_parser
+==45809== 
+PASS: basic argument parsing
+PASS: double-quoted argument
+PASS: pipeline parsing
+PASS: redirection parsing
+PASS: append redirection parsing
+PASS: unterminated quote rejected
+PASS: leading pipe rejected
+PASS: trailing pipe rejected
+PASS: non-terminal background operator rejected
+PASS: single-quoted argument is literal
+PASS: single quotes do not process escapes
+PASS: backslash outside quotes escapes a space
+PASS: backslash escapes an operator
+PASS: double quotes escape an embedded quote
+PASS: empty double-quoted argument preserved
+PASS: empty single-quoted argument preserved
+PASS: unterminated single quote rejected
+PASS: trailing backslash rejected
+PASS: empty line ignored
+PASS: whitespace-only line ignored
+PASS: maximum of 128 arguments accepted
+PASS: 129th argument rejected
+PASS: NULL line parameter safely rejected
+PASS: NULL pipeline parameter safely rejected
+PASS: multiple input redirections rejected
+PASS: multiple output redirections rejected
+PASS: multiple append redirections rejected
+PASS: overwrite followed by append redirection rejected
+PASS: append followed by overwrite redirection rejected
+PASS: reversed order redirection (output then input) parsed correctly
+PASS: multiple background operators rejected
+PASS: dangling input redirection rejected
+PASS: dangling output redirection rejected
+PASS: dangling append redirection rejected
+PASS: consecutive pipes rejected
+PASS: double pipe operator rejected
+PASS: three-stage pipeline parsed successfully
+PASS: mixed quote embedding parsed correctly
+PASS: repeated parse-and-free lifecycle leak-free under ASan
+PASS: cat < a < b
+PASS: echo x > a > b
+PASS: echo x >> a > b
+PASS: echo x > a >> b
+PASS: echo x >> a >> b
+PASS: echo x | cat < a < b
+PASS: echo x | cat > a > b
+PASS: | cat
+PASS: echo x |
+PASS: echo x || cat
+PASS: echo x | | cat
+PASS: cat < | cat
+PASS: echo x >>> a
+PASS: echo x & cat
+PASS: echo x & | cat
+PASS: echo x &&
+PASS: echo x & &
+PASS: echo x & cat &
+PASS: &
+PASS: echo x | &
+PASS: 32 pipeline stages accepted
+PASS: 33 pipeline stages rejected and allocations released
+PASS: quoted and escaped operators remain arguments
+PASS: adjacent operators accepted without whitespace
+
+Parser tests: 0 failed
+==45809== 
+==45809== HEAP SUMMARY:
+==45809==     in use at exit: 0 bytes in 0 blocks
+==45809==   total heap usage: 2,893 allocs, 2,893 frees, 86,291 bytes allocated
+==45809== 
+==45809== All heap blocks were freed -- no leaks are possible
+==45809== 
+==45809== For lists of detected and suppressed errors, rerun with: -s
+==45809== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./build/test_executor
+==45810== Memcheck, a memory error detector
+==45810== Copyright (C) 2002-2026, and GNU GPL'd, by Julian Seward et al.
+==45810== Using Valgrind-3.27.1 and LibVEX; rerun with -h for copyright info
+==45810== Command: ./build/test_executor
+==45810== 
+PASS: parent builtin accepts input redirection
+PASS: parent builtin combines input and output redirection
+shell: cannot open /: Is a directory
+PASS: output failure after input redirect returns failure
+shell: cannot open /tmp/simple-shell-input-WSobs7: No such file or directory
+PASS: parent builtin rejects missing input file
+PASS: stdin restored after successful and failed builtin redirects
+PASS: stdout restored after builtin redirect failures
+PASS: foreground signal maps to 128 plus signal
+[background pid 45812 exited 0]
+[background pid 45813 exited 0]
+waitid fixture: No child processes
+PASS: middle background job is reaped after signal
+FAIL: out-of-order reaping preserves other background jobs
+==45810== 
+==45810== HEAP SUMMARY:
+==45810==     in use at exit: 0 bytes in 0 blocks
+==45810==   total heap usage: 120 allocs, 120 frees, 53,378 bytes allocated
+==45810== 
+==45810== All heap blocks were freed -- no leaks are possible
+==45810== 
+==45810== For lists of detected and suppressed errors, rerun with: -s
+==45810== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+make: *** [Makefile:72: valgrind] Error 2

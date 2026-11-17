@@ -9,7 +9,7 @@
 | Executor component test | Built-in/external pipeline stages, statuses, both-child waiting, EOF, descriptor stress, and reaping | [Executor tests](../tests/test_executor.c); results in the [test report](../docs/Test_Report.md) |
 | Termination cleanup harness | `SIGTERM` foreground wait interruption and background descendant reaping (`make test` / `make asan-test`) | [Termination harness](../tests/test_termination.py); results in the [test report](../docs/Test_Report.md) |
 | GitHub Actions | Automated CI pipeline triggered on PRs and commits targeting `main` with step timeouts | `.github/workflows/ci.yml` configured and active on `ubuntu-latest` (Refs Issue #8) |
-| AddressSanitizer / UndefinedBehaviorSanitizer | Memory violation, leak detection, and undefined-behaviour checks via `make asan-test` | Automated in CI and local harness (`tests/test_sanitizers.sh`); zero diagnostics emitted across 164 checks |
+| AddressSanitizer / UndefinedBehaviorSanitizer | Memory violation, leak detection, and undefined-behaviour checks via `make asan-test` | Automated in CI and local harness (`tests/test_sanitizers.sh`); zero diagnostics emitted across 182 checks |
 | Valgrind | Memory and descriptor leak verification on unit harnesses and pipeline/background scenario | Target `make valgrind` active in CI; `0 errors from 0 contexts` |
 
 ## Bug-fix & CI Validation Process

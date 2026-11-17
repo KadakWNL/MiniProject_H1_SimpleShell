@@ -6,6 +6,7 @@
 - **Target Environment:** Linux / POSIX.1-2008
 - **Repository:** https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell
 - **Status date:** 12 November 2026
+- **Part-3 testing integration:** 17 November 2026 (test-only; production code unchanged)
 
 ---
 
@@ -86,8 +87,11 @@ evidence remains tracked in issue #18; the joint review and sign-off is tracked 
 - **Release Tags:** `v1.0-final` was tagged on `main` at commit `859b43e` on 12 November 2026 and
   published as a GitHub release. Final demonstration acceptance remains tracked in
   [issue #18](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/18).
-- **Documentation restructure:** SRS/Test Plan/SAD restructure is prepared on branch
-  `docs/ieee-restructure` and opened as PR #33 for review before the final submission.
+- **Documentation restructure:** the IEEE-format SRS, Test Plan, and SAD restructure was merged to
+  `main` via PR #33 on 12 November 2026.
+- **Part-3 testing package:** the expanded executor and termination harnesses, the four Part-3
+  reports, the coverage target, and the retained evidence are prepared on branch
+  `part-3/integrate-testing-package` for review before submission.
 
 ---
 
@@ -101,7 +105,11 @@ evidence remains tracked in issue #18; the joint review and sign-off is tracked 
 | **Test Plan** | `2-Test-Planning/Test_Plan.md` | **Finalized (IEEE 829/29119-3)** | Sections 3–5 complete; security validation in Section 5.1. |
 | **Traceability Matrix** | `docs/RTM.md` | **Updated** | FR/NFR to use case, module, test, and tracking issue; SR/SO mapping note. |
 | **Test Cases & Procedures** | `docs/Test_Cases.md` | **Complete** | Functional test cases (TC-01..18) and non-functional procedures (NFRV-01..08). |
-| **Test Execution Report** | `docs/Test_Report.md` | **Complete** | Recorded runs across parser, executor, shell integration, and termination cleanup suites (164 checks per build + Valgrind) with historical baseline retained. |
+| **Test Execution Report** | `docs/Test_Report.md` | **Complete** | Recorded runs across parser, executor, shell integration, and termination cleanup suites (164 checks per build + Valgrind) with historical baseline retained; Part-3 expanded suite recorded separately (182 checks). |
+| **Unit Test Report** | `docs/Unit_Test_Report.md` | **Complete (Part-3)** | Parser and executor/component results across standard, sanitizer, and coverage builds. |
+| **System Validation Report** | `docs/System_Validation_Report.md` | **Complete (Part-3)** | End-to-end shell and SIGTERM lifecycle validation with disposition and limitations. |
+| **Code Coverage Report** | `docs/Code_Coverage_Report.md` | **Complete (Part-3)** | 75.99% production line coverage with gcov evidence. |
+| **Branch Coverage Report** | `docs/Branch_Coverage_Report.md` | **Complete (Part-3)** | 69.27% outgoing branch-edge coverage with gcov evidence. |
 | **Validation Specification** | `docs/Validation_Specification.md` | **Complete** | Security validation SEC-01..06 and penetration-test plan. |
 | **Project Status** | `docs/Project_Status.md` | **Finalized** | Synchronized with live issues, PRs, and sprint status. |
 | **Sprint Backlog** | `docs/Sprint_Backlog.md` | **Synchronized** | Reflects completed Sprint 1/2/3 work and remaining final checks. |
@@ -114,5 +122,5 @@ evidence remains tracked in issue #18; the joint review and sign-off is tracked 
 
 1. **Final 2-Minute Demo Video (Issue #18):** record and link the final demonstration; complete release acceptance.
 2. **Joint Final Review (Issue #30):** both reviewers sign off on the same final commit after #18 is closed.
-3. **Merge the documentation restructure:** review and merge PR #33 before the submission snapshot.
+3. **Review the Part-3 testing branch:** approve and merge `part-3/integrate-testing-package` so the four reports and the 182-check suite land on `main`.
 4. **Refresh the demo evidence index:** attach the final recording and remaining screenshots.

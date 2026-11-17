@@ -113,3 +113,23 @@ make valgrind
 - **NFR-03 (Memory Safety):** Clean execution under AddressSanitizer, UndefinedBehaviorSanitizer, and Valgrind with zero memory leaks, zero buffer overflows, and verified file descriptor hygiene under tight rlimits.
 - **NFR-05 (Portability):** Verified clean compilation under strict standard GCC C11 flags (`-std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes`) with LF normalized line endings across platforms.
 - **NFR-06 (Testability):** Functional behavior, multi-stage pipelines, error recovery, and signal-driven termination cleanup have automated regression coverage in the project test suite and CI workflow.
+
+## 9. Part-3 expanded testing (test-only change)
+
+Part 3 adds lifecycle and resource-failure coverage without changing production C code, which remains
+at `v1.0-final` (`859b43e`). The expanded executor and termination harnesses raise the suite from 164
+to **182 checks per build** (parser 63, executor 45, shell 70, termination 4); test cases TC-19, TC-20,
+and TC-21 record the new scenarios in [Test_Cases.md](Test_Cases.md).
+
+| Report | Result | Location |
+|---|---|---|
+| Unit Test Report | 108 passed (parser 63, executor 45), standard, sanitizer, and coverage builds | [Unit_Test_Report.md](Unit_Test_Report.md) |
+| System Validation Report | 74 passed (shell 70, termination 4) | [System_Validation_Report.md](System_Validation_Report.md) |
+| Code Coverage Report | 671 / 883 lines = 75.99% | [Code_Coverage_Report.md](Code_Coverage_Report.md) |
+| Branch Coverage Report | 399 / 576 branch edges = 69.27% | [Branch_Coverage_Report.md](Branch_Coverage_Report.md) |
+
+The suite was re-executed on 17 November 2026 after integration onto the IEEE-restructured `main`:
+`make test` and `make asan-test` each passed 182 checks, `make valgrind` reported 0 errors, and
+`make coverage` reproduced the percentages above. Raw logs are in
+[`docs/evidence/verify-2026-11-17/`](evidence/verify-2026-11-17/summary.md). CI validation of the
+expanded suite is pending a pull request; this section does not claim a CI run for it.
