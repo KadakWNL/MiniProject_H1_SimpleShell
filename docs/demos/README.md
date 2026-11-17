@@ -58,3 +58,14 @@ Total: 18 passed, 0 failed (exit code: 0)
 - Clean-clone build and test suite pass 100% on GCC C11.
 - Local verification executed using the MSYS2 POSIX compatibility environment (GCC 15.2.0, GNU Make 4.4.1).
 - Native Linux execution and memory safety checks (`make test`, CI workflow) are verified on Ubuntu (`ubuntu-latest`) via GitHub Actions.
+
+## Final Release Demonstration — Issue #18
+
+- **Video:** [`final_demo.mp4`](final_demo.mp4), exactly 2:00 (H.264/AAC, 1280×720, 15 fps).
+- **Raw terminal session:** [`final_demo.cast`](final_demo.cast), an Asciicast v2 capture from the actual `v1.0-final` shell process in a Linux PTY.
+- **Narration and captions:** [narration script](Final_Demo_Narration.md), [subtitle track](final_demo.srt), and natural neural English speech generated with Microsoft Edge TTS (`en-US-JennyNeural`).
+- **Thumbnail:** [`final_demo_thumbnail.png`](final_demo_thumbnail.png).
+- **Source release:** `v1.0-final` at `859b43ea8847b9abff28b9ea2c537b4c593deb5e`.
+- **Verification:** `make` and `make test` passed; 164 checks passed, 0 failed (parser 63, executor 29, shell integration 70, termination 2).
+
+The final clip demonstrates launch and prompt, built-ins and quoted input, `<`, `>`, `>>`, a four-stage pipeline with built-in `echo`, immediate background prompt return and completion, malformed-syntax recovery, and the live automated test run. The video is rendered from the raw PTY recording; command output is genuine.
