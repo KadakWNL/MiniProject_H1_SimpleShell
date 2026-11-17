@@ -91,13 +91,30 @@ make ci
 
 The timing failure did not reproduce on the complete sanitizer rerun and was later hardened deterministically via marker-file synchronization in PR #31 (`dc44a8b`). The historical initial sanitizer failure is retained here rather than omitted.
 
-### Latest CI run (GitHub Actions `ubuntu-latest`, post-`v1.0-final` — CI Run #77)
+### Historical CI run (GitHub Actions `ubuntu-latest`, post-`v1.0-final` — CI Run #77)
 
 | Command | Parser | Executor | Shell integration | Termination (`test_termination.py`) | Result |
 |---|---:|---:|---:|---:|---|
 | `make test` | 63 passed, 0 failed | 29 passed, 0 failed | 70 passed, 0 failed | 2 passed, 0 failed | Passed (164 checks) |
 | `make asan-test` | 63 passed, 0 failed | 29 passed, 0 failed | 70 passed, 0 failed | 2 passed, 0 failed | Passed (164 checks); no sanitizer diagnostics |
 | `make valgrind` | `0 errors` | `0 errors` | `0 errors` (`echo audit \| cat / sleep 30 & / exit`) | N/A (tested under ASan/UBSan) | Passed (0 leaks, 0 errors across all contexts) |
+
+### Confirmed PR #34 CI run (GitHub Actions `ubuntu-latest`, PR #34 head `1c23b8b1` — CI Run #82)
+
+[CI Run #82](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/actions/runs/44011706095) completed successfully on the PR #34 head branch before merging into `main`:
+- `make test`: 63 parser + 29 executor + 70 shell integration + 2 termination (`test_termination.py`) = 164 passed, 0 failed.
+- `make asan-test`: 164 passed, 0 failed (zero ASan/UBSan diagnostics).
+- `make valgrind`: 0 errors from 0 contexts, 0 bytes definitely lost.
+
+### Latest Main CI run (GitHub Actions `ubuntu-latest`, current `main` `a5bf25ec` — CI Run #83)
+
+Executed on Ubuntu 26.04.1 LTS (`gcc 15.2.0`, kernel `7.0.0-1019-azure`) in [CI Run #83](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/actions/runs/44012102281):
+
+| Command | Parser | Executor | Shell integration | Termination (`test_termination.py`) | Result |
+|---|---:|---:|---:|---:|---|
+| `make test` | 63 passed, 0 failed | 29 passed, 0 failed | 70 passed, 0 failed | 2 passed, 0 failed | Passed (164 checks) |
+| `make asan-test` | 63 passed, 0 failed | 29 passed, 0 failed | 70 passed, 0 failed | 2 passed, 0 failed | Passed (164 checks); zero sanitizer diagnostics |
+| `make valgrind` | `0 errors` | `0 errors` | `0 errors` (`echo audit \| cat / sleep 30 & / exit`) | N/A (tested under ASan/UBSan) | Passed (167 Valgrind reports with 0 errors; 164 leak summaries with 0 bytes definitely lost) |
 
 ## 7. Reproduction
 

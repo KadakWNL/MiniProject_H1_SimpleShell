@@ -4,7 +4,7 @@
 |---|---|---|
 | Sprint 1 one-minute working-product demo | Recording committed | [Sprint 1 Demo Documentation & Video](../docs/demos/README.md) (`docs/demos/simple-shell-sprint1-demo.mp4`, 58.1 s) |
 | Sprint 1 output screenshots | Captured | Frames extracted from the committed recording at 4 s, 15 s, 30 s, 44 s, and 57 s in [`screenshots/`](screenshots/) |
-| Sprint 2/final two-minute demo | Recorded and committed | [`se-compressed.mp4`](../docs/demos/se-compressed.mp4), 1:58.63 (Issue #18) |
+| Sprint 2/final two-minute demo | Recorded and committed | [`se-compressed.mp4`](../docs/demos/se-compressed.mp4), 1:58.63 (Issue #18 closed via PR #34) |
 | Final output/test screenshots | Captured | [`screenshots/final_ci_latest_run.png`](screenshots/final_ci_latest_run.png) and [`screenshots/final_release_v1.0-final.png`](screenshots/final_release_v1.0-final.png) |
 
 ## Sprint 1 output frames
@@ -23,6 +23,6 @@ pages after the `v1.0-final` release.
 
 ## Final release demo - Issue #18
 
-- **Video:** [`docs/demos/se-compressed.mp4`](../docs/demos/se-compressed.mp4), supplied for final submission; duration 1:58.63.
-- **Release:** `v1.0-final` is published on `main` at the release commit documented in the project release notes.
-- **Existing evidence:** [`screenshots/final_ci_latest_run.png`](screenshots/final_ci_latest_run.png) and [`screenshots/final_release_v1.0-final.png`](screenshots/final_release_v1.0-final.png).
+- **Video:** [`docs/demos/se-compressed.mp4`](../docs/demos/se-compressed.mp4), committed on `main` and merged via PR #34; duration 118.63 s (1:58.63).
+- **Release:** `v1.0-final` is published on `main` at commit `859b43ea8847b9abff28b9ea2c537b4c593deb5e` (code baseline; PR #33 and PR #34 are documentation and evidence commits).
+- **Existing evidence:** [`screenshots/final_ci_latest_run.png`](screenshots/final_ci_latest_run.png) and [`screenshots/final_release_v1.0-final.png`](screenshots/final_release_v1.0-final.png). Issue #18 is closed.
