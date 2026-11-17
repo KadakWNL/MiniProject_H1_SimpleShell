@@ -24,5 +24,5 @@ pages after the `v1.0-final` release.
 ## Final release demo - Issue #18
 
 - **Video:** [`docs/demos/se-compressed.mp4`](../docs/demos/se-compressed.mp4), committed on `main` and merged via PR #34; duration 118.63 s (1:58.63).
-- **Release:** `v1.0-final` is published on `main` at commit `859b43ea8847b9abff28b9ea2c537b4c593deb5e` (code baseline; PR #33 and PR #34 are documentation and evidence commits).
+- **Release:** `v1.0-final` is published on `main` at commit `859b43ea8847b9abff28b9ea2c537b4c593deb5e` (production baseline; PR #33 and PR #34 are documentation and evidence, and PR #35 is the test/coverage expansion).
 - **Existing evidence:** [`screenshots/final_ci_latest_run.png`](screenshots/final_ci_latest_run.png) and [`screenshots/final_release_v1.0-final.png`](screenshots/final_release_v1.0-final.png). Issue #18 is closed.

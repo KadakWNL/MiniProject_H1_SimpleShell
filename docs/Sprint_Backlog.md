@@ -5,18 +5,22 @@
 **ETA:** 12th October 2026  
 **Status:** Published to GitHub Issues & Board
 
-Status snapshot (12 November 2026): all Sprint 1 stories and all Sprint 2 development stories
-(#10–#17) are completed and verified. Operator validation and two-stage pipelines were merged in
+Status snapshot (17 November 2026): all Sprint 1 stories and all Sprint 2 development stories
+(#10–#17) plus the final demo/release check #18 are completed and verified. Operator validation and
+two-stage pipelines were merged in
 [PR #27](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/27), background
 execution in [PR #28](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/28),
 documentation in [PR #29](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/29),
 multi-stage pipelines and regression in
-[PR #31](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/31), and the resource
-audit in [PR #32](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/32).
+[PR #31](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/31), the resource
+audit in [PR #32](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/32), the
+IEEE documentation restructure in
+[PR #33](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/33), and the final
+two-minute demo in [PR #34](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/34).
 
-The final demonstration/release check (#18) is closed after
-[PR #34](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/34) merged the 1:58.63
-recording; the joint final review (#30) remains open. Sprint 3
+The Part-3 expanded suite, four test reports, and coverage tooling were merged in
+[PR #35](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/pull/35). The post-sprint
+joint final review (#30) remains open. Sprint 3
 was closed on 9 November 2026 after its three spillover stories (#13, #15, #16) were accepted.
 Consult the [live issues](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues)
 and [board](https://github.com/orgs/SE-H1-SimpleShell/projects/2) for the current state.

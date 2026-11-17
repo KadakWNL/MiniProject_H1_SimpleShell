@@ -5,9 +5,9 @@
 - **Primary Language:** C (ISO C11)
 - **Target Environment:** Linux / POSIX.1-2008
 - **Repository:** https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell
-- **Status date:** 12 November 2026
+- **Status date:** 17 November 2026
 - **Final demo merged:** 17 November 2026 (PR #34, issue #18 closed)
-- **Part-3 testing integration:** 17 November 2026 (test-only; production code unchanged)
+- **Part-3 testing merged:** 17 November 2026 (PR #35; tests and coverage only, production code unchanged)
 
 ---
 
@@ -26,8 +26,9 @@ The following core and advanced features are merged into `main` and verified thr
 - **Operator Pre-Validation:** Syntax validation rejecting duplicate background operators (`&&`, `& &`), misplaced `&`, duplicate redirections, and limits before process spawning or file creation.
 
 Development is feature-complete and tagged `v1.0-final` (12 November 2026). The final 1:58.63
-recording is merged on `main` via PR #34 (17 November 2026) and issue #18 is closed; the joint review
-and sign-off remains tracked in issue #30.
+recording is merged on `main` via PR #34 (17 November 2026) and issue #18 is closed. The Part-3
+expanded suite (182 checks) and the four Part-3 reports were merged via PR #35 on the same day;
+production C code is unchanged. The joint review and sign-off remains tracked in issue #30.
 
 ---
 
@@ -85,7 +86,7 @@ and sign-off remains tracked in issue #30.
 | [#30](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/30) | [FinalChecks] Joint final project review and sign-off | @KadakWNL, @ShrikarDesai07 | **Open** | Joint final review |
 
 ### Pull Request Status
-- **Merged Pull Requests:** PRs #20, #21, #22, #23, #24, #25, #26, #27, #28, #29, #31, #32, #33, and #34 are merged into `main`.
+- **Merged Pull Requests:** PRs #20, #21, #22, #23, #24, #25, #26, #27, #28, #29, #31, #32, #33, #34, and #35 are merged into `main`.
 - **Release Tags:** `v1.0-final` was tagged on `main` at commit `859b43e` on 12 November 2026 and
   published as a GitHub release. The final 1:58.63 recording is merged via PR #34; joint sign-off
   remains tracked in [issue #30](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/issues/30).
@@ -112,6 +113,7 @@ and sign-off remains tracked in issue #30.
 | **System Validation Report** | `docs/System_Validation_Report.md` | **Complete (Part-3)** | End-to-end shell and SIGTERM lifecycle validation with disposition and limitations. |
 | **Code Coverage Report** | `docs/Code_Coverage_Report.md` | **Complete (Part-3)** | 75.99% production line coverage with gcov evidence. |
 | **Branch Coverage Report** | `docs/Branch_Coverage_Report.md` | **Complete (Part-3)** | 69.27% outgoing branch-edge coverage with gcov evidence. |
+| **Part-3 Test Suite** | `tests/`, `docs/evidence/` | **Complete (Part-3)** | 182 checks per build; 75.99% line / 69.27% branch; merged via PR #35. |
 | **Validation Specification** | `docs/Validation_Specification.md` | **Complete** | Security validation SEC-01..06 and penetration-test plan. |
 | **Project Status** | `docs/Project_Status.md` | **Finalized** | Synchronized with live issues, PRs, and sprint status. |
 | **Sprint Backlog** | `docs/Sprint_Backlog.md` | **Synchronized** | Reflects completed Sprint 1/2/3 work and remaining final checks. |
@@ -123,6 +125,6 @@ and sign-off remains tracked in issue #30.
 
 ## 5. Remaining Work Prior to Final Submission
 
-1. **Joint Final Review (Issue #30):** both reviewers sign off on the same final commit.
-2. **Review the Part-3 testing branch:** approve and merge `part-3/integrate-testing-package` so the four reports and the 182-check suite land on `main`.
-3. **Clean-clone verification:** build and run the full suite on the final `main` after both merges.
+1. **Joint Final Review (Issue #30):** both reviewers sign off on the same final commit (`10794b2`, plus the documents-only #36 merge once accepted).
+2. **Review and merge PR #36:** the final review report has been rebased and refreshed to the 182-check state; awaiting CI and re-approval.
+3. **Clean-clone verification:** build and run the full suite on the final `main` after #36 merges.
