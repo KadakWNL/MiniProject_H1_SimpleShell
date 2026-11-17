@@ -133,3 +133,9 @@ The suite was re-executed on 17 November 2026 after integration onto the IEEE-re
 `make coverage` reproduced the percentages above. Raw logs are in
 [`docs/evidence/verify-2026-11-17/`](evidence/verify-2026-11-17/summary.md). CI validation of the
 expanded suite is pending a pull request; this section does not claim a CI run for it.
+
+The first CI run for the Part-3 pull request exposed one flaky assertion rather than a product
+failure: TC-13 compared a 2-second background `sleep` against a strict 2-second wall-clock bound, and
+sanitizer startup pushed it to 2 seconds. The check now launches a 30-second background job and
+asserts that the prompt returns within 5 seconds, which keeps the non-blocking assertion while
+removing the dependence on sanitizer startup time.
