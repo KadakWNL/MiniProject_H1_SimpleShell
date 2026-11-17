@@ -1,8 +1,8 @@
 # Test Report — Simple Shell
 
-## 1. Latest Release & CI Validation Summary (`v1.0-final`)
+## 1. `v1.0-final` Release Baseline
 
-Following the merge of the resource-audit and termination-cleanup hardening in PR #32 (`main` commit `859b43e`, tagged `v1.0-final`), the full suite runs **four complementary validation harnesses totaling 164 automated checks per build** across `make test` and `make asan-test`, plus Valgrind leak/descriptor analysis via `make valgrind`.
+Following the merge of the resource-audit and termination-cleanup hardening in PR #32 (`main` commit `859b43e`, tagged `v1.0-final`), the release baseline runs **four complementary validation harnesses totaling 164 automated checks per build** across `make test` and `make asan-test`, plus Valgrind leak/descriptor analysis via `make valgrind`. The current Part-3 suite totals **182 checks**; its results are in Section 9.
 
 | Suite / Harness | Passed | Failed | Evidence |
 |---|---:|---:|---|
@@ -91,13 +91,40 @@ make ci
 
 The timing failure did not reproduce on the complete sanitizer rerun and was later hardened deterministically via marker-file synchronization in PR #31 (`dc44a8b`). The historical initial sanitizer failure is retained here rather than omitted.
 
-### Latest CI run (GitHub Actions `ubuntu-latest`, post-`v1.0-final` — CI Run #77)
+### Historical CI run (GitHub Actions `ubuntu-latest`, post-`v1.0-final` — CI Run #77)
 
 | Command | Parser | Executor | Shell integration | Termination (`test_termination.py`) | Result |
 |---|---:|---:|---:|---:|---|
 | `make test` | 63 passed, 0 failed | 29 passed, 0 failed | 70 passed, 0 failed | 2 passed, 0 failed | Passed (164 checks) |
 | `make asan-test` | 63 passed, 0 failed | 29 passed, 0 failed | 70 passed, 0 failed | 2 passed, 0 failed | Passed (164 checks); no sanitizer diagnostics |
 | `make valgrind` | `0 errors` | `0 errors` | `0 errors` (`echo audit \| cat / sleep 30 & / exit`) | N/A (tested under ASan/UBSan) | Passed (0 leaks, 0 errors across all contexts) |
+
+### Historical PR #34 CI run (pre-Part-3, GitHub Actions `ubuntu-latest`, head `1c23b8b1` — CI Run #82)
+
+[CI Run #82](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/actions/runs/44011706095) completed successfully on the PR #34 head branch before merging into `main`:
+- `make test`: 63 parser + 29 executor + 70 shell integration + 2 termination (`test_termination.py`) = 164 passed, 0 failed.
+- `make asan-test`: 164 passed, 0 failed (zero ASan/UBSan diagnostics).
+- `make valgrind`: 0 errors from 0 contexts, 0 bytes definitely lost.
+
+### Historical main CI run before PR #35 (`a5bf25ec` — CI Run #83)
+
+Executed on Ubuntu 26.04.1 LTS (`gcc 15.2.0`, kernel `7.0.0-1019-azure`) in [CI Run #83](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/actions/runs/44012102281):
+
+| Command | Parser | Executor | Shell integration | Termination (`test_termination.py`) | Result |
+|---|---:|---:|---:|---:|---|
+| `make test` | 63 passed, 0 failed | 29 passed, 0 failed | 70 passed, 0 failed | 2 passed, 0 failed | Passed (164 checks) |
+| `make asan-test` | 63 passed, 0 failed | 29 passed, 0 failed | 70 passed, 0 failed | 2 passed, 0 failed | Passed (164 checks); zero sanitizer diagnostics |
+| `make valgrind` | `0 errors` | `0 errors` | `0 errors` (`echo audit \| cat / sleep 30 & / exit`) | N/A (tested under ASan/UBSan) | Passed (167 Valgrind reports with 0 errors; 164 leak summaries with 0 bytes definitely lost) |
+
+### Latest main CI run after PR #35 (`10794b2` — CI Run #87)
+
+[CI Run #87](https://github.com/SE-H1-SimpleShell/MiniProject_H1_SimpleShell/actions/runs/44015713358) completed successfully on `main` after PR #35 merged:
+
+| Command | Parser | Executor | Shell integration | Termination (`test_termination.py`) | Result |
+|---|---:|---:|---:|---:|---|
+| `make test` | 63 passed, 0 failed | 45 passed, 0 failed | 70 passed, 0 failed | 4 passed, 0 failed | Passed (182 checks) |
+| `make asan-test` | 63 passed, 0 failed | 45 passed, 0 failed | 70 passed, 0 failed | 4 passed, 0 failed | Passed (182 checks); zero sanitizer diagnostics |
+| `make valgrind` | `0 errors` | `0 errors` | `0 errors` (`echo audit \| cat / sleep 30 & / exit`) | N/A (tested under ASan/UBSan) | Passed (0 errors across all contexts) |
 
 ## 7. Reproduction
 
@@ -109,7 +136,7 @@ make valgrind
 
 ## 8. Traceability to Quality Requirements
 
-- **NFR-01 (Reliability):** Regression procedures and pipeline cases in TC-01 through TC-18 were exercised with 164 automated checks per successful build (161 historical Sprint 2 baseline + 3 termination/SIGTERM checks added in PR #32) across standard and sanitizer modes.
+- **NFR-01 (Reliability):** Regression procedures and pipeline cases in TC-01 through TC-21 were exercised with 182 automated checks per successful build (161 historical Sprint 2 baseline + 3 termination/SIGTERM checks in PR #32 + 18 Part-3 checks) across standard and sanitizer modes.
 - **NFR-03 (Memory Safety):** Clean execution under AddressSanitizer, UndefinedBehaviorSanitizer, and Valgrind with zero memory leaks, zero buffer overflows, and verified file descriptor hygiene under tight rlimits.
 - **NFR-05 (Portability):** Verified clean compilation under strict standard GCC C11 flags (`-std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wformat=2 -Wstrict-prototypes`) with LF normalized line endings across platforms.
 - **NFR-06 (Testability):** Functional behavior, multi-stage pipelines, error recovery, and signal-driven termination cleanup have automated regression coverage in the project test suite and CI workflow.
@@ -131,8 +158,8 @@ and TC-21 record the new scenarios in [Test_Cases.md](Test_Cases.md).
 The suite was re-executed on 17 November 2026 after integration onto the IEEE-restructured `main`:
 `make test` and `make asan-test` each passed 182 checks, `make valgrind` reported 0 errors, and
 `make coverage` reproduced the percentages above. Raw logs are in
-[`docs/evidence/verify-2026-11-17/`](evidence/verify-2026-11-17/summary.md). CI validation of the
-expanded suite is pending a pull request; this section does not claim a CI run for it.
+[`docs/evidence/verify-2026-11-17/`](evidence/verify-2026-11-17/summary.md). CI validated the
+expanded suite on PR #35 and on `main` in CI Run #87 (Section 6).
 
 The first CI run for the Part-3 pull request exposed one flaky assertion rather than a product
 failure: TC-13 compared a 2-second background `sleep` against a strict 2-second wall-clock bound, and
