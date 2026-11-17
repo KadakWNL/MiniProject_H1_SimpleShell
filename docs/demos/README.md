@@ -59,7 +59,7 @@ Total: 18 passed, 0 failed (exit code: 0)
 - Local verification executed using the MSYS2 POSIX compatibility environment (GCC 15.2.0, GNU Make 4.4.1).
 - Native Linux execution and memory safety checks (`make test`, CI workflow) are verified on Ubuntu (`ubuntu-latest`) via GitHub Actions.
 
-## Final Release Demonstration ? Issue #18
+## Final Release Demonstration - Issue #18
 
 - **Video:** [`se-compressed.mp4`](se-compressed.mp4), supplied for final submission; duration 1:58.63.
 - **Source release:** `v1.0-final` is already published on `main`.
