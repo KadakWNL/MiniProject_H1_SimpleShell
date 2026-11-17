@@ -1,5 +1,7 @@
 # Final Demo Script — 2 minutes
 
+Final recording: [`se-compressed.mp4`](../docs/demos/se-compressed.mp4) (1:58.63, Issue #18).
+
 Record after Sprint 2 regression tests and release-candidate review. Demonstrate only features that work in the tested commit.
 
 | Time | Action | What to show |
